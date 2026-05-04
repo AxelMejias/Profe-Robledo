@@ -1,5 +1,3 @@
-from app.core.repository import BaseRepository
+from app.modules.auth.repository import UsuarioRepository
 
-# TODO: implementar en el change correspondiente
-# class UsuariosRepository(BaseRepository[Usuarios]):
-#     pass
+__all__ = ["UsuarioRepository"]

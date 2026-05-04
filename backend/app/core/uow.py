@@ -43,8 +43,8 @@ class UnitOfWork:
         await self._session.flush()
 
     def _init_repositories(self) -> None:
-        # Los repositorios de cada módulo se agregan aquí a medida que se implementan.
-        # Ejemplo (change us-001-auth):
-        #   from app.modules.usuarios.repository import UsuarioRepository
-        #   self.usuarios = UsuarioRepository(self._session)
-        pass
+        from app.modules.auth.repository import UsuarioRepository
+        from app.modules.refreshtokens.repository import RefreshTokenRepository
+
+        self.usuarios = UsuarioRepository(self._session)
+        self.refresh_tokens = RefreshTokenRepository(self._session)

@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.modules.usuarios.model import Usuario
 
 
 class Rol(SQLModel, table=True):
@@ -27,3 +30,7 @@ class UsuarioRol(SQLModel, table=True):
     asignado_en: datetime = Field(default_factory=datetime.utcnow)
 
     rol: Optional[Rol] = Relationship(back_populates="usuario_roles")
+    usuario: Optional["Usuario"] = Relationship(
+        back_populates="usuario_roles",
+        sa_relationship_kwargs={"foreign_keys": "[UsuarioRol.usuario_id]"},
+    )

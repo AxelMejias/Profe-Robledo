@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.modules.auth.model import UsuarioRol
 
 
 class Usuario(SQLModel, table=True):
@@ -16,3 +19,8 @@ class Usuario(SQLModel, table=True):
     creado_en: datetime = Field(default_factory=datetime.utcnow)
     actualizado_en: datetime = Field(default_factory=datetime.utcnow)
     eliminado_en: Optional[datetime] = Field(default=None)
+
+    usuario_roles: list["UsuarioRol"] = Relationship(
+        back_populates="usuario",
+        sa_relationship_kwargs={"foreign_keys": "[UsuarioRol.usuario_id]"},
+    )

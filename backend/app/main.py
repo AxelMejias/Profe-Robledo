@@ -1,16 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from app.core.config import settings
-
-# ---------------------------------------------------------------------------
-# Rate limiter — se inyecta como dependencia en los routers que lo necesiten
-# (principalmente POST /auth/login)
-# ---------------------------------------------------------------------------
-limiter = Limiter(key_func=get_remote_address)
+from app.core.limiter import limiter
 
 app = FastAPI(
     title="Food Store API",
@@ -37,8 +31,8 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # Routers — se descomentan a medida que se implementa cada change
 # ---------------------------------------------------------------------------
-# from app.modules.auth.router import router as auth_router
-# from app.modules.usuarios.router import router as usuarios_router
+from app.modules.auth.router import router as auth_router
+from app.modules.usuarios.router import router as usuarios_router
 # from app.modules.direcciones.router import router as direcciones_router
 # from app.modules.categorias.router import router as categorias_router
 # from app.modules.productos.router import router as productos_router
@@ -46,8 +40,8 @@ app.add_middleware(
 # from app.modules.pagos.router import router as pagos_router
 # from app.modules.admin.router import router as admin_router
 
-# app.include_router(auth_router,       prefix="/api/v1")
-# app.include_router(usuarios_router,   prefix="/api/v1")
+app.include_router(auth_router,       prefix="/api/v1")
+app.include_router(usuarios_router,   prefix="/api/v1")
 # app.include_router(direcciones_router, prefix="/api/v1")
 # app.include_router(categorias_router, prefix="/api/v1")
 # app.include_router(productos_router,  prefix="/api/v1")
