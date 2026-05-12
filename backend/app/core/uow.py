@@ -46,7 +46,10 @@ class UnitOfWork:
         from app.modules.usuarios.repository import UsuarioRepository
         from app.modules.refreshtokens.repository import RefreshTokenRepository
         from app.modules.categorias.repository import CategoriaRepository
+        from app.modules.productos.repository import ProductoRepository, IngredienteRepository
 
         self.usuarios: UsuarioRepository = UsuarioRepository(self._session)
         self.refresh_tokens: RefreshTokenRepository = RefreshTokenRepository(self._session)
         self.categorias: CategoriaRepository = CategoriaRepository(self._session)
+        self.productos: ProductoRepository = ProductoRepository(self._session)
+        self.ingredientes: IngredienteRepository = IngredienteRepository(self._session)
