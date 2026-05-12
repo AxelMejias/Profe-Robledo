@@ -1,0 +1,19 @@
+name: us-000-setup
+description: Infraestructura base del proyecto Food Store
+created_at: "2026-04-27"
+status: ready
+schema: default
+apply_requires:
+  - proposal
+  - design
+  - tasks
+artifacts:
+  proposal:
+    status: done
+    path: proposal.md
+  design:
+    status: done
+    path: design.md
+  tasks:
+    status: done
+    path: tasks.md

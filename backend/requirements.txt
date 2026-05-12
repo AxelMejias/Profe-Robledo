@@ -1,0 +1,30 @@
+# Web framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+
+# ORM + base de datos
+sqlmodel>=0.0.21
+sqlalchemy[asyncio]>=2.0.36
+alembic>=1.13.3
+asyncpg>=0.30.0          # 0.30.0 agrega soporte Python 3.13
+psycopg2-binary>=2.9.10  # 2.9.10 incluye wheels para Python 3.13 en Windows
+
+# Validación y configuración
+# pydantic-core>=2.23.0 es requisito implícito para Python 3.13 (PyO3 >0.21)
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
+pydantic[email]>=2.9.0
+
+# Seguridad
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.12
+
+# Rate limiting
+slowapi>=0.1.9
+
+# MercadoPago
+mercadopago>=2.3.0
+
+# HTTP client (tests / webhooks)
+httpx>=0.27.0
