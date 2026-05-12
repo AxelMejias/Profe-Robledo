@@ -38,7 +38,7 @@ async def _create_token_pair(
     )
     raw_refresh = create_refresh_token()
     token_hash = hashlib.sha256(raw_refresh.encode()).hexdigest()
-    expires_at = datetime.now(timezone.utc) + timedelta(
+    expires_at = datetime.utcnow() + timedelta(
         days=settings.REFRESH_TOKEN_EXPIRE_DAYS
     )
     await uow.refresh_tokens.create(
@@ -106,7 +106,7 @@ async def refresh(uow: UnitOfWork, raw_token: str) -> TokenResponse:
             detail="Token ya utilizado. Sesión terminada por seguridad.",
         )
 
-    if rt.expires_at < datetime.now(timezone.utc):
+    if rt.expires_at < datetime.utcnow():
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expirado")
 
     await uow.refresh_tokens.revoke(rt)

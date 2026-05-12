@@ -60,6 +60,25 @@ FORMAS_PAGO = [
 ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL",    "admin@foodstore.com")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin1234!")
 
+CATEGORIAS = [
+    ("Hamburguesas", "Clásicas y especiales"),
+    ("Bebidas",      "Frías y calientes"),
+    ("Postres",      "Dulces para cerrar"),
+    ("Combos",       "Armá tu combo completo"),
+]
+
+# (nombre, descripcion, precio, stock, categoria)
+PRODUCTOS = [
+    ("Hamburguesa Clásica",   "Carne, lechuga, tomate y queso",        1200.00, 50, "Hamburguesas"),
+    ("Hamburguesa Doble",     "Doble medallón con cheddar y cebolla",  1750.00, 30, "Hamburguesas"),
+    ("Hamburguesa BBQ",       "Medallón, panceta y salsa BBQ",         1900.00, 25, "Hamburguesas"),
+    ("Coca-Cola 500ml",       "Lata fría",                              350.00, 100, "Bebidas"),
+    ("Agua Mineral",          "Sin gas, 500ml",                         200.00, 80,  "Bebidas"),
+    ("Jugo de Naranja",       "Natural exprimido",                      450.00, 40,  "Bebidas"),
+    ("Brownie con helado",    "Brownie tibio + bocha de vainilla",      800.00, 20,  "Postres"),
+    ("Combo Clásico",         "Hamburguesa Clásica + bebida a elección", 1500.00, 40, "Combos"),
+]
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -128,6 +147,62 @@ def _seed_formas_pago(conn) -> None:
     print(f"  formas_pago    → {inserted} insertados, {skipped} ya existían")
 
 
+def _seed_categorias(conn) -> dict[str, int]:
+    """Inserta categorías y devuelve un dict nombre→id."""
+    nombre_a_id: dict[str, int] = {}
+    for nombre, descripcion in CATEGORIAS:
+        row = conn.execute(
+            text("SELECT id FROM categorias WHERE nombre = :nombre AND eliminado_en IS NULL"),
+            {"nombre": nombre},
+        ).fetchone()
+        if row:
+            nombre_a_id[nombre] = row[0]
+        else:
+            result = conn.execute(
+                text(
+                    "INSERT INTO categorias (nombre, descripcion) "
+                    "VALUES (:nombre, :descripcion) RETURNING id"
+                ),
+                {"nombre": nombre, "descripcion": descripcion},
+            )
+            nombre_a_id[nombre] = result.fetchone()[0]
+    print(f"  categorias     → {len(CATEGORIAS)} procesadas")
+    return nombre_a_id
+
+
+def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
+    inserted = 0
+    for nombre, descripcion, precio, stock, categoria in PRODUCTOS:
+        row = conn.execute(
+            text("SELECT id FROM productos WHERE nombre = :nombre AND eliminado_en IS NULL"),
+            {"nombre": nombre},
+        ).fetchone()
+        if row:
+            producto_id = row[0]
+        else:
+            result = conn.execute(
+                text(
+                    "INSERT INTO productos (nombre, descripcion, precio_base, stock_cantidad, disponible) "
+                    "VALUES (:nombre, :descripcion, :precio, :stock, true) RETURNING id"
+                ),
+                {"nombre": nombre, "descripcion": descripcion, "precio": precio, "stock": stock},
+            )
+            producto_id = result.fetchone()[0]
+            inserted += 1
+
+        cat_id = nombre_a_cat_id.get(categoria)
+        if cat_id:
+            conn.execute(
+                text(
+                    "INSERT INTO producto_categorias (producto_id, categoria_id, es_principal) "
+                    "VALUES (:pid, :cid, true) ON CONFLICT DO NOTHING"
+                ),
+                {"pid": producto_id, "cid": cat_id},
+            )
+    skipped = len(PRODUCTOS) - inserted
+    print(f"  productos      → {inserted} insertados, {skipped} ya existían")
+
+
 def _seed_admin_user(conn) -> None:
     # Verificar si ya existe
     row = conn.execute(
@@ -179,6 +254,8 @@ def run() -> None:
         _seed_estados_pedido(conn)
         _seed_formas_pago(conn)
         _seed_admin_user(conn)
+        cat_ids = _seed_categorias(conn)
+        _seed_productos(conn, cat_ids)
 
     print()
     print("Seed completado.")

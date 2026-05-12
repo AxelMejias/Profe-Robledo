@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     MP_ACCESS_TOKEN: str = ""
     MP_PUBLIC_KEY: str = ""
     MP_NOTIFICATION_URL: str = ""
+    MP_WEBHOOK_SECRET: str = ""
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

@@ -47,9 +47,17 @@ class UnitOfWork:
         from app.modules.refreshtokens.repository import RefreshTokenRepository
         from app.modules.categorias.repository import CategoriaRepository
         from app.modules.productos.repository import ProductoRepository, IngredienteRepository
+        from app.modules.pedidos.repository import PedidoRepository
+        from app.modules.direcciones.repository import DireccionRepository
+        from app.modules.pagos.repository import PagoRepository
+        from app.modules.admin.repository import AdminRepository
 
         self.usuarios: UsuarioRepository = UsuarioRepository(self._session)
         self.refresh_tokens: RefreshTokenRepository = RefreshTokenRepository(self._session)
         self.categorias: CategoriaRepository = CategoriaRepository(self._session)
         self.productos: ProductoRepository = ProductoRepository(self._session)
         self.ingredientes: IngredienteRepository = IngredienteRepository(self._session)
+        self.pedidos: PedidoRepository = PedidoRepository(self._session)
+        self.direcciones: DireccionRepository = DireccionRepository(self._session)
+        self.pagos: PagoRepository = PagoRepository(self._session)
+        self.admin: AdminRepository = AdminRepository(self._session)

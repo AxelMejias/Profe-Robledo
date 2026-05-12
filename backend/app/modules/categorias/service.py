@@ -92,7 +92,7 @@ async def update(uow: UnitOfWork, categoria_id: int, data: CategoriaUpdate) -> C
     if data.imagen_url is not None:
         cat.imagen_url = data.imagen_url
 
-    cat.actualizado_en = datetime.now(timezone.utc)
+    cat.actualizado_en = datetime.utcnow()
     updated = await uow.categorias.update(cat)
     return CategoriaRead.model_validate(updated)
 

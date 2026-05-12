@@ -54,7 +54,7 @@ async def crear_pago(
     if pago_existente:
         pago_existente.mp_payment_id = mp_payment_id
         pago_existente.mp_status = mp_status
-        pago_existente.actualizado_en = datetime.now(timezone.utc)
+        pago_existente.actualizado_en = datetime.utcnow()
         pago = await uow.pagos.update(pago_existente)
     else:
         pago = await uow.pagos.create(
@@ -144,7 +144,7 @@ async def procesar_webhook(
     # Actualizar estado del pago
     pago.mp_status = mp_status
     pago.mp_payment_id = int(payment_id)
-    pago.actualizado_en = datetime.now(timezone.utc)
+    pago.actualizado_en = datetime.utcnow()
     await uow.pagos.update(pago)
 
     # RN-FS02: PENDIENTE→CONFIRMADO solo por webhook aprobado
@@ -159,7 +159,7 @@ async def procesar_webhook(
                     uow.pedidos.session.add(producto)
 
             pedido.estado_codigo = "CONFIRMADO"
-            pedido.actualizado_en = datetime.now(timezone.utc)
+            pedido.actualizado_en = datetime.utcnow()
             await uow.pedidos.update(pedido)
 
             # RN-FS07: historial append-only

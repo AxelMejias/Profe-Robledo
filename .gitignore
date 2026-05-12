@@ -36,3 +36,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Contexto de sesión (uso interno)
+CONTEXT.md
