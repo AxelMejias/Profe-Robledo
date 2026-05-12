@@ -45,6 +45,8 @@ class UnitOfWork:
     def _init_repositories(self) -> None:
         from app.modules.usuarios.repository import UsuarioRepository
         from app.modules.refreshtokens.repository import RefreshTokenRepository
+        from app.modules.categorias.repository import CategoriaRepository
 
         self.usuarios: UsuarioRepository = UsuarioRepository(self._session)
         self.refresh_tokens: RefreshTokenRepository = RefreshTokenRepository(self._session)
+        self.categorias: CategoriaRepository = CategoriaRepository(self._session)

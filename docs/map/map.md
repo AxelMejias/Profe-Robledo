@@ -59,15 +59,17 @@
 
 ## 🔐 AUTENTICACIÓN Y USUARIOS
 
-### 2. `us-001-auth` 🔄 EN PROGRESO
+### 2. `us-001-auth` ✅ IMPLEMENTADO
 
 **Funcionalidad:** JWT (HS256, 30 min) + refresh token (UUID v4, 7 días, rotación + replay attack detection), RBAC con 4 roles (ADMIN/STOCK/PEDIDOS/CLIENT), endpoints register/login/refresh/logout/me.
 **Dependencias:** `us-000-setup`
 
-- [ ] JWT access token + refresh token con rotación y replay attack detection
-- [ ] Endpoints: POST /register, POST /login, POST /refresh, POST /logout, GET /me
-- [ ] Dependencias `get_current_user` y `require_role` para otros módulos
-- [ ] Rate limiting: 5 intentos/IP en 15 min en POST /login
+- [x] JWT access token + refresh token con rotación y replay attack detection
+- [x] Endpoints: POST /register, POST /login, POST /refresh, POST /logout, GET /me
+- [x] Dependencias `get_current_user` y `require_role` para otros módulos
+- [x] Rate limiting: 5 intentos/IP en 15 min en POST /login
+- [x] PUT /usuarios/{id}/roles con protección RN-RB04 (último ADMIN)
+- [x] core/deps.py, core/limiter.py, UoW registra repos
 
 ---
 
@@ -126,7 +128,7 @@
 
 - Total changes: 9
 - Archivados: 1 (us-000-setup)
-- En progreso: 1 (us-001-auth)
+- Implementados: 1 (us-001-auth)
 - Pendientes: 7
 - Arquitectura: Feature-First backend + Feature-Sliced Design frontend ✔
 - Patrones: BaseRepository[T] + UoW + soft delete + snapshot + FSM ✔
