@@ -43,7 +43,7 @@ export function PagoExitoso({ pedidoId }: PagoExitosoProps) {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Número de pedido</span>
-              <span className="text-2xl font-bold text-primary">#{pedido.id}</span>
+              <span className="text-2xl font-bold text-primary-500">#{pedido.id}</span>
             </div>
             <div className="flex justify-between items-center pt-3 border-t">
               <span className="text-gray-600">Total pagado</span>
@@ -86,3 +86,4 @@ export function PagoExitoso({ pedidoId }: PagoExitosoProps) {
     </div>
   );
 }
+

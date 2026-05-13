@@ -44,7 +44,7 @@ export function FiltrosCatalogo({
         <h2 className="text-lg font-semibold">Filtros</h2>
         <button
           onClick={handleLimpiarFiltros}
-          className="text-sm text-primary hover:underline"
+          className="text-sm text-primary-500 hover:underline"
         >
           Limpiar
         </button>
@@ -81,7 +81,7 @@ export function FiltrosCatalogo({
               onClick={() => onCategoriaChange?.(undefined)}
               className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                 !selectedCategoria
-                  ? 'bg-primary text-white'
+                  ? 'bg-primary-500 text-white'
                   : 'hover:bg-gray-100'
               }`}
             >
@@ -94,7 +94,7 @@ export function FiltrosCatalogo({
                 onClick={() => onCategoriaChange?.(categoria.id)}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                   selectedCategoria === categoria.id
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary-500 text-white'
                     : 'hover:bg-gray-100'
                 }`}
               >
@@ -148,3 +148,4 @@ export function FiltrosCatalogo({
     </aside>
   );
 }
+

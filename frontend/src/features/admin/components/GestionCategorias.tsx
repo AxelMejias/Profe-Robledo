@@ -61,7 +61,7 @@ export function GestionCategorias() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(cat)}
-                  className="text-primary hover:underline text-sm"
+                  className="text-primary-500 hover:underline text-sm"
                 >
                   Editar
                 </button>
@@ -115,3 +115,4 @@ export function GestionCategorias() {
     </div>
   );
 }
+

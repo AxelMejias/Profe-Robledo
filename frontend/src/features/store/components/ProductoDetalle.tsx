@@ -99,7 +99,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
 
             {/* Precio y stock */}
             <div className="space-y-2">
-              <div className="text-4xl font-bold text-primary">
+              <div className="text-4xl font-bold text-primary-500">
                 ${producto.precio_base}
               </div>
               <div className="text-sm text-gray-600">
@@ -185,3 +185,4 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
     </div>
   );
 }
+

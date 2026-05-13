@@ -38,7 +38,7 @@ export function GestionPedidos() {
               }}
               className={`px-4 py-2 rounded-md text-sm transition-colors ${
                 estadoFilter === estado
-                  ? 'bg-primary text-white'
+                  ? 'bg-primary-500 text-white'
                   : 'bg-gray-100 hover:bg-gray-200'
               }`}
             >
@@ -104,7 +104,7 @@ export function GestionPedidos() {
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <Link
                     to={`/pedidos/${pedido.id}`}
-                    className="text-primary hover:underline text-sm"
+                    className="text-primary-500 hover:underline text-sm"
                   >
                     Ver detalle
                   </Link>
@@ -140,3 +140,4 @@ export function GestionPedidos() {
     </div>
   );
 }
+

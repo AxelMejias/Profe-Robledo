@@ -53,7 +53,7 @@ export function ProductoCard({ producto }: ProductoCardProps) {
 
       {/* Info */}
       <div className="p-4 space-y-3">
-        <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary-500 transition-colors">
           {producto.nombre}
         </h3>
 
@@ -64,7 +64,7 @@ export function ProductoCard({ producto }: ProductoCardProps) {
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-primary">
+          <span className="text-2xl font-bold text-primary-500">
             ${producto.precio_base}
           </span>
 
@@ -81,3 +81,4 @@ export function ProductoCard({ producto }: ProductoCardProps) {
     </Link>
   );
 }
+

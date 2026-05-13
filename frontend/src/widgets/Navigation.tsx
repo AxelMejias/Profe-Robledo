@@ -23,22 +23,22 @@ export function Navigation() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="text-2xl">🍔</span>
-            <span className="text-xl font-bold text-primary">Food Store</span>
+            <span className="text-xl font-bold text-primary-500">Food Store</span>
           </Link>
 
           {/* Menu */}
           <div className="flex items-center gap-6">
-            <Link to="/catalogo" className="hover:text-primary transition-colors">
+            <Link to="/catalogo" className="hover:text-primary-500 transition-colors">
               Catálogo
             </Link>
 
             {isAuthenticated && (
               <>
-                <Link to="/pedidos" className="hover:text-primary transition-colors">
+                <Link to="/pedidos" className="hover:text-primary-500 transition-colors">
                   Mis Pedidos
                 </Link>
 
-                <Link to="/carrito" className="relative hover:text-primary transition-colors">
+                <Link to="/carrito" className="relative hover:text-primary-500 transition-colors">
                   🛒 Carrito
                   {itemCount() > 0 && (
                     <Badge
@@ -52,13 +52,13 @@ export function Navigation() {
                 </Link>
 
                 {hasRole('ADMIN') && (
-                  <Link to="/admin" className="hover:text-primary transition-colors">
+                  <Link to="/admin" className="hover:text-primary-500 transition-colors">
                     Admin
                   </Link>
                 )}
 
                 <div className="flex items-center gap-3">
-                  <Link to="/perfil" className="hover:text-primary transition-colors">
+                  <Link to="/perfil" className="hover:text-primary-500 transition-colors">
                     👤 {user?.nombre}
                   </Link>
                   <Button onClick={handleLogout} variant="ghost" size="sm">
@@ -84,3 +84,4 @@ export function Navigation() {
     </nav>
   );
 }
+

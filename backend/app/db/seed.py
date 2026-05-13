@@ -69,14 +69,14 @@ CATEGORIAS = [
 
 # (nombre, descripcion, precio, stock, categoria)
 PRODUCTOS = [
-    ("Hamburguesa Clásica",   "Carne, lechuga, tomate y queso",        1200.00, 50, "Hamburguesas"),
-    ("Hamburguesa Doble",     "Doble medallón con cheddar y cebolla",  1750.00, 30, "Hamburguesas"),
-    ("Hamburguesa BBQ",       "Medallón, panceta y salsa BBQ",         1900.00, 25, "Hamburguesas"),
-    ("Coca-Cola 500ml",       "Lata fría",                              350.00, 100, "Bebidas"),
-    ("Agua Mineral",          "Sin gas, 500ml",                         200.00, 80,  "Bebidas"),
-    ("Jugo de Naranja",       "Natural exprimido",                      450.00, 40,  "Bebidas"),
-    ("Brownie con helado",    "Brownie tibio + bocha de vainilla",      800.00, 20,  "Postres"),
-    ("Combo Clásico",         "Hamburguesa Clásica + bebida a elección", 1500.00, 40, "Combos"),
+    ("Hamburguesa Clásica",   "Carne, lechuga, tomate y queso",        1200.00, 50, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+Clasica"),
+    ("Hamburguesa Doble",     "Doble medallón con cheddar y cebolla",  1750.00, 30, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+Doble"),
+    ("Hamburguesa BBQ",       "Medallón, panceta y salsa BBQ",         1900.00, 25, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+BBQ"),
+    ("Coca-Cola 500ml",       "Lata fría",                              350.00, 100, "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Coca+Cola"),
+    ("Agua Mineral",          "Sin gas, 500ml",                         200.00, 80,  "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Agua+Mineral"),
+    ("Jugo de Naranja",       "Natural exprimido",                      450.00, 40,  "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Jugo+Naranja"),
+    ("Brownie con helado",    "Brownie tibio + bocha de vainilla",      800.00, 20,  "Postres",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Brownie+Helado"),
+    ("Combo Clásico",         "Hamburguesa Clásica + bebida a elección", 1500.00, 40, "Combos",      "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Combo+Clasico"),
 ]
 
 
@@ -172,7 +172,7 @@ def _seed_categorias(conn) -> dict[str, int]:
 
 def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
     inserted = 0
-    for nombre, descripcion, precio, stock, categoria in PRODUCTOS:
+    for nombre, descripcion, precio, stock, categoria, imagen_url in PRODUCTOS:
         row = conn.execute(
             text("SELECT id FROM productos WHERE nombre = :nombre AND eliminado_en IS NULL"),
             {"nombre": nombre},
@@ -182,10 +182,10 @@ def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
         else:
             result = conn.execute(
                 text(
-                    "INSERT INTO productos (nombre, descripcion, precio_base, stock_cantidad, disponible) "
-                    "VALUES (:nombre, :descripcion, :precio, :stock, true) RETURNING id"
+                    "INSERT INTO productos (nombre, descripcion, precio_base, stock_cantidad, disponible, imagen_url) "
+                    "VALUES (:nombre, :descripcion, :precio, :stock, true, :imagen) RETURNING id"
                 ),
-                {"nombre": nombre, "descripcion": descripcion, "precio": precio, "stock": stock},
+                {"nombre": nombre, "descripcion": descripcion, "precio": precio, "stock": stock, "imagen": imagen_url},
             )
             producto_id = result.fetchone()[0]
             inserted += 1

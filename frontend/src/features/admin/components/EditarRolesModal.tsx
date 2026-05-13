@@ -62,7 +62,7 @@ export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
                 type="checkbox"
                 checked={selectedRoles.includes(rol)}
                 onChange={() => toggleRole(rol)}
-                className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
               />
               <div className="flex-1">
                 <span className="font-medium">{rol}</span>
@@ -83,3 +83,4 @@ export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
     </Modal>
   );
 }
+

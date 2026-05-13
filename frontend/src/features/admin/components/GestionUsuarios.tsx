@@ -69,7 +69,7 @@ export function GestionUsuarios() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <button
                     onClick={() => setEditingUsuario(usuario)}
-                    className="text-primary hover:underline"
+                    className="text-primary-500 hover:underline"
                   >
                     Editar roles
                   </button>
@@ -89,3 +89,4 @@ export function GestionUsuarios() {
     </div>
   );
 }
+

@@ -94,7 +94,7 @@ export function CrearPedidoForm() {
             <button
               type="button"
               onClick={() => navigate('/perfil/direcciones')}
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary-500 hover:underline"
             >
               Gestionar direcciones
             </button>
@@ -119,7 +119,7 @@ export function CrearPedidoForm() {
                   key={dir.id}
                   className={`block p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                     direccionSeleccionada === dir.id
-                      ? 'border-primary bg-blue-50'
+                      ? 'border-primary-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -146,7 +146,7 @@ export function CrearPedidoForm() {
                       </p>
                     </div>
                     {direccionSeleccionada === dir.id && (
-                      <span className="text-primary text-xl">✓</span>
+                      <span className="text-primary-500 text-xl">✓</span>
                     )}
                   </div>
                 </label>
@@ -164,7 +164,7 @@ export function CrearPedidoForm() {
                 key={fp.codigo}
                 className={`block p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                   formaPagoSeleccionada === fp.codigo
-                    ? 'border-primary bg-blue-50'
+                    ? 'border-primary-500 bg-blue-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -182,7 +182,7 @@ export function CrearPedidoForm() {
                     <p className="text-sm text-gray-600">{fp.descripcion}</p>
                   </div>
                   {formaPagoSeleccionada === fp.codigo && (
-                    <span className="text-primary text-xl">✓</span>
+                    <span className="text-primary-500 text-xl">✓</span>
                   )}
                 </div>
               </label>
@@ -198,7 +198,7 @@ export function CrearPedidoForm() {
             onChange={(e) => setNotas(e.target.value)}
             placeholder="Ej: Tocar timbre, no hay portero eléctrico"
             rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
 
@@ -218,7 +218,7 @@ export function CrearPedidoForm() {
           <div className="pt-4 border-t">
             <div className="flex justify-between text-xl font-bold">
               <span>Total</span>
-              <span className="text-primary">${total()}</span>
+              <span className="text-primary-500">${total()}</span>
             </div>
           </div>
         </div>
@@ -240,3 +240,4 @@ export function CrearPedidoForm() {
     </div>
   );
 }
+

@@ -59,7 +59,7 @@ export function SeleccionarDireccion({
                     onClick={() => handleSelect(dir)}
                     className={`w-full text-left p-4 border-2 rounded-lg transition-colors ${
                       selectedId === dir.id
-                        ? 'border-primary bg-blue-50'
+                        ? 'border-primary-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -89,7 +89,7 @@ export function SeleccionarDireccion({
                         )}
                       </div>
                       {selectedId === dir.id && (
-                        <span className="text-primary text-xl ml-2">✓</span>
+                        <span className="text-primary-500 text-xl ml-2">✓</span>
                       )}
                     </div>
                   </button>
@@ -127,3 +127,4 @@ export function SeleccionarDireccion({
     </>
   );
 }
+

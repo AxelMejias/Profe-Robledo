@@ -107,7 +107,7 @@ export function PedidosList() {
                 }}
                 className={`px-4 py-2 rounded-md text-sm transition-colors ${
                   estadoFilter === estado.codigo
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary-500 text-white'
                     : 'bg-gray-100 hover:bg-gray-200'
                 }`}
               >
@@ -192,7 +192,7 @@ function PedidoCard({ pedido }: PedidoCardProps) {
         </div>
 
         <div className="text-right">
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-2xl font-bold text-primary-500">
             ${pedido.total}
           </div>
           <div className="text-xs text-gray-500">
@@ -211,3 +211,4 @@ function PedidoCard({ pedido }: PedidoCardProps) {
     </Link>
   );
 }
+

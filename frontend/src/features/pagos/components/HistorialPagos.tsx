@@ -97,8 +97,9 @@ function PagoItem({ pago, index }: PagoItemProps) {
 
       {/* Monto destacado */}
       <div className="text-right">
-        <p className="text-xl font-bold text-primary">${pago.monto}</p>
+        <p className="text-xl font-bold text-primary-500">${pago.monto}</p>
       </div>
     </div>
   );
 }
+

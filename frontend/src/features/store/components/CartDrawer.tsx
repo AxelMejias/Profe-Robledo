@@ -124,7 +124,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
               <div className="flex-1 space-y-1">
                 <Link
                   to={`/producto/${item.producto_id}`}
-                  className="font-medium hover:text-primary transition-colors"
+                  className="font-medium hover:text-primary-500 transition-colors"
                 >
                   {item.nombre}
                 </Link>
@@ -136,7 +136,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
                 )}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-primary">
+                  <span className="text-sm font-semibold text-primary-500">
                     ${item.precio}
                   </span>
 
@@ -187,7 +187,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
           </div>
           <div className="flex justify-between text-xl font-bold pt-2 border-t">
             <span>Total</span>
-            <span className="text-primary">${total()}</span>
+            <span className="text-primary-500">${total()}</span>
           </div>
         </div>
 
@@ -261,3 +261,4 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
     </>
   );
 }
+

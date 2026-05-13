@@ -202,7 +202,7 @@ export function FormDireccion({ direccion, onClose }: FormDireccionProps) {
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="Ej: Casa con portón verde, tocar timbre 3 veces"
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Información adicional para facilitar la entrega
@@ -228,3 +228,4 @@ export function FormDireccion({ direccion, onClose }: FormDireccionProps) {
     </Modal>
   );
 }
+

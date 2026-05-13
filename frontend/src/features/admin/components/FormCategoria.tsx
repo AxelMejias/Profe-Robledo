@@ -94,7 +94,7 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           )}
@@ -116,3 +116,4 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
     </Modal>
   );
 }
+

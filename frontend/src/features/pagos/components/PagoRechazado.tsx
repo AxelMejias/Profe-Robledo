@@ -115,7 +115,7 @@ export function PagoRechazado({ pedidoId }: PagoRechazadoProps) {
             También podés{' '}
             <button
               onClick={() => navigate(`/pedidos/${pedidoId}`)}
-              className="text-primary hover:underline"
+              className="text-primary-500 hover:underline"
             >
               cancelar este pedido
             </button>
@@ -126,3 +126,4 @@ export function PagoRechazado({ pedidoId }: PagoRechazadoProps) {
     </div>
   );
 }
+

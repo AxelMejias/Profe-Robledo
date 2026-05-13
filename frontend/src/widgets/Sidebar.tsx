@@ -41,7 +41,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Link
             to="/admin"
             onClick={onClose}
-            className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-primary"
+            className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-primary-500"
           >
             Panel de Administración
           </Link>
@@ -59,7 +59,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Link
               to="/register"
               onClick={onClose}
-              className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-primary"
+              className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-primary-500"
             >
               Registrarse
             </Link>
@@ -69,3 +69,4 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     </Modal>
   );
 }
+

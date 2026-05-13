@@ -15,7 +15,7 @@ export function HomePage() {
             Los mejores productos alimenticios al alcance de un clic
           </p>
           <Link to="/catalogo">
-            <Button size="lg" variant="ghost" className="bg-white text-primary hover:bg-gray-100">
+            <Button size="lg" variant="ghost" className="bg-white text-primary-500 hover:bg-gray-100">
               Ver catálogo
             </Button>
           </Link>
@@ -47,3 +47,4 @@ export function HomePage() {
     </div>
   );
 }
+

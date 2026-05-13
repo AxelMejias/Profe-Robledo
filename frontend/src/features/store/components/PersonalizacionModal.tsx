@@ -51,7 +51,7 @@ export function PersonalizacionModal({
                 type="checkbox"
                 checked={excluidos.includes(ing.id)}
                 onChange={() => toggleIngrediente(ing.id)}
-                className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
               />
 
               <div className="flex-1 flex items-center gap-2">
@@ -98,3 +98,4 @@ export function PersonalizacionModal({
     </Modal>
   );
 }
+

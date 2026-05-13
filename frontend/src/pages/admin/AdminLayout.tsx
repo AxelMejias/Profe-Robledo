@@ -37,7 +37,7 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md">
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-primary mb-6">Admin Panel</h2>
+          <h2 className="text-2xl font-bold text-primary-500 mb-6">Admin Panel</h2>
           <nav className="space-y-2">
             {menuItems.map((item) => (
               <Link
@@ -60,3 +60,4 @@ export function AdminLayout() {
     </div>
   );
 }
+

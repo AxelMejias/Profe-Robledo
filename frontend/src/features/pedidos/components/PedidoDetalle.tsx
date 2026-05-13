@@ -181,7 +181,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
                   ${detalle.precio_snapshot} × {detalle.cantidad}
                 </p>
               </div>
-              <p className="font-semibold text-primary">${detalle.subtotal}</p>
+              <p className="font-semibold text-primary-500">${detalle.subtotal}</p>
             </div>
           ))}
         </div>
@@ -229,7 +229,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
           </div>
           <div className="flex justify-between pt-2 border-t text-xl">
             <span className="font-bold">Total</span>
-            <span className="font-bold text-primary">${pedido.total}</span>
+            <span className="font-bold text-primary-500">${pedido.total}</span>
           </div>
         </div>
 
@@ -351,3 +351,4 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
     </div>
   );
 }
+

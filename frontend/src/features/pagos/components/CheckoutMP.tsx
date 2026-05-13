@@ -109,7 +109,7 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-sm text-gray-600">Pedido #{pedido.id}</p>
-              <p className="text-2xl font-bold text-primary">${pedido.total}</p>
+              <p className="text-2xl font-bold text-primary-500">${pedido.total}</p>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
         {/* Formulario de MP */}
         {isProcessing || pollingActive ? (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-500"></div>
             <p className="text-lg font-medium">Procesando pago...</p>
             <p className="text-sm text-gray-600 text-center">
               No cierres esta ventana. Estamos confirmando tu pago.
@@ -144,3 +144,4 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
     </div>
   );
 }
+

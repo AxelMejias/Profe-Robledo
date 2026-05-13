@@ -115,7 +115,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           )}
@@ -193,7 +193,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                 type="checkbox"
                 checked={field.state.value}
                 onChange={(e) => field.handleChange(e.target.checked)}
-                className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
               />
               <label className="text-sm font-medium text-gray-700">
                 Disponible para la venta
@@ -223,7 +223,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                       setSelectedCats((prev) => prev.filter((id) => id !== cat.id));
                     }
                   }}
-                  className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                  className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                 />
                 <span className="text-sm">{cat.nombre}</span>
               </label>
@@ -247,3 +247,4 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
     </Modal>
   );
 }
+

@@ -127,7 +127,7 @@ export function GestionProductos() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                     <button
                       onClick={() => handleEdit(producto)}
-                      className="text-primary hover:underline mr-4"
+                      className="text-primary-500 hover:underline mr-4"
                     >
                       Editar
                     </button>
@@ -182,3 +182,4 @@ export function GestionProductos() {
     </div>
   );
 }
+

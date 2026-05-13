@@ -15,7 +15,7 @@ const ESTADOS_ORDEN = [
 
 function getEstadoColor(estado: string, completado: boolean, actual: boolean): string {
   if (estado === 'CANCELADO') return 'bg-danger text-white';
-  if (actual) return 'bg-primary text-white animate-pulse';
+  if (actual) return 'bg-primary-500 text-white animate-pulse';
   if (completado) return 'bg-secondary text-white';
   return 'bg-gray-300 text-gray-600';
 }
@@ -125,7 +125,7 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
                     esUltimo
-                      ? 'bg-primary text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-secondary text-white'
                   }`}
                 >
@@ -157,3 +157,4 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
     </div>
   );
 }
+

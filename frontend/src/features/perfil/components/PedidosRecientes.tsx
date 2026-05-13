@@ -72,7 +72,7 @@ export function PedidosRecientes() {
                 <p className="text-sm text-gray-600">{fecha}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-primary">${pedido.total}</p>
+                <p className="text-lg font-bold text-primary-500">${pedido.total}</p>
               </div>
             </div>
           </Link>
@@ -82,10 +82,11 @@ export function PedidosRecientes() {
       {/* Link "Ver todos" */}
       <Link
         to="/pedidos"
-        className="block text-center py-3 text-primary hover:underline font-medium"
+        className="block text-center py-3 text-primary-500 hover:underline font-medium"
       >
         Ver todos mis pedidos →
       </Link>
     </div>
   );
 }
+
