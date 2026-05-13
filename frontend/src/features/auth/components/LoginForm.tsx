@@ -46,7 +46,8 @@ export function LoginForm() {
       const redirectTo = searchParams.get('redirect') || '/catalogo';
       navigate(redirectTo);
     } catch (err: any) {
-      const message = err.response?.data?.detail || 'Email o contraseña incorrectos';
+      const raw = err.response?.data?.detail;
+      const message = Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : (raw || 'Email o contraseña incorrectos');
       setError(message);
       useAuthStore.getState().logout();
     } finally {

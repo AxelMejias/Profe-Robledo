@@ -66,11 +66,12 @@ export function RegisterForm() {
       addToast('success', '¡Cuenta creada exitosamente!');
       navigate('/catalogo');
     } catch (err: any) {
-      const detail = err.response?.data?.detail;
-      if (detail?.includes('email')) {
+      const raw = err.response?.data?.detail;
+      const msg = raw ? (Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : String(raw)) : 'Error al crear la cuenta';
+      if (msg.toLowerCase().includes('email')) {
         setErrors({ email: 'El email ya está registrado' });
       } else {
-        setErrors({ general: detail || 'Error al crear la cuenta' });
+        setErrors({ general: msg });
       }
     } finally {
       setLoading(false);

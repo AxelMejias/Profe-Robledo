@@ -26,7 +26,9 @@ function ToastItem({ toast }: { toast: ToastType }) {
       )}
     >
       <span className="text-xl font-bold">{icons[toast.type]}</span>
-      <p className="flex-1 text-sm font-medium">{toast.message}</p>
+      <p className="flex-1 text-sm font-medium">
+        {typeof toast.message === 'string' ? toast.message : 'Error inesperado'}
+      </p>
       <button
         onClick={() => removeToast(toast.id)}
         className="text-lg leading-none opacity-50 hover:opacity-100 transition-opacity"
