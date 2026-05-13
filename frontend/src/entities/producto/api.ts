@@ -39,4 +39,9 @@ export const productosApi = {
     const { data } = await api.patch(`/productos/${id}/stock`, { cantidad });
     return data;
   },
+
+  assignCategorias: async (id: number, categoria_ids: number[]): Promise<Producto> => {
+    const { data } = await api.put(`/productos/${id}/categorias`, { categoria_ids });
+    return data;
+  },
 };

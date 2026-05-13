@@ -75,3 +75,16 @@ export function useUpdateStock() {
     },
   });
 }
+
+export function useAssignCategorias() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, categoria_ids }: { id: number; categoria_ids: number[] }) =>
+      productosApi.assignCategorias(id, categoria_ids),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['productos'] });
+      queryClient.invalidateQueries({ queryKey: ['productos', id] });
+    },
+  });
+}
