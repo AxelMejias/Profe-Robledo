@@ -65,7 +65,7 @@ async def update_ingrediente(
         ing.descripcion = data.descripcion
     if data.es_alergeno is not None:
         ing.es_alergeno = data.es_alergeno
-    ing.actualizado_en = datetime.utcnow()
+    ing.actualizado_en = datetime.now(timezone.utc)
     updated = await uow.ingredientes.update(ing)
     return IngredienteRead.model_validate(updated)
 
@@ -170,7 +170,7 @@ async def update(uow: UnitOfWork, producto_id: int, data: ProductoUpdate) -> Pro
     if data.disponible is not None:
         producto.disponible = data.disponible
 
-    producto.actualizado_en = datetime.utcnow()
+    producto.actualizado_en = datetime.now(timezone.utc)
     updated = await uow.productos.update(producto)
     return ProductoRead.model_validate(updated)
 
@@ -182,7 +182,7 @@ async def patch_disponibilidad(
     if producto is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
     producto.disponible = data.disponible
-    producto.actualizado_en = datetime.utcnow()
+    producto.actualizado_en = datetime.now(timezone.utc)
     updated = await uow.productos.update(producto)
     return ProductoRead.model_validate(updated)
 

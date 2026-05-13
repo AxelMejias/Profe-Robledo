@@ -16,7 +16,7 @@ class RefreshTokenRepository(BaseRepository[RefreshToken]):
         return result.scalar_one_or_none()
 
     async def revoke(self, rt: RefreshToken) -> None:
-        rt.revoked_at = datetime.utcnow()
+        rt.revoked_at = datetime.now(timezone.utc)
         self.session.add(rt)
         await self.session.flush()
 
@@ -25,7 +25,7 @@ class RefreshTokenRepository(BaseRepository[RefreshToken]):
             update(RefreshToken)
             .where(RefreshToken.usuario_id == usuario_id)
             .where(RefreshToken.revoked_at.is_(None))
-            .values(revoked_at=datetime.utcnow())
+            .values(revoked_at=datetime.now(timezone.utc))
         )
         await self.session.execute(stmt)
         await self.session.flush()

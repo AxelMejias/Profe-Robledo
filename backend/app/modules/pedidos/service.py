@@ -247,7 +247,7 @@ async def avanzar_estado(
                 uow.pedidos.session.add(producto)
 
     pedido.estado_codigo = nuevo_estado
-    pedido.actualizado_en = datetime.utcnow()
+    pedido.actualizado_en = datetime.now(timezone.utc)
     pedido = await uow.pedidos.update(pedido)
 
     # RN-FS07: historial append-only
@@ -286,7 +286,7 @@ async def cancelar_pedido(
 
     estado_anterior = pedido.estado_codigo
     pedido.estado_codigo = "CANCELADO"
-    pedido.actualizado_en = datetime.utcnow()
+    pedido.actualizado_en = datetime.now(timezone.utc)
     pedido = await uow.pedidos.update(pedido)
 
     await uow.pedidos.add_historial(
