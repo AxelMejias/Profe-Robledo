@@ -1,28 +1,33 @@
 import { createBrowserRouter } from 'react-router-dom';
+
+// Páginas públicas
+import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { CatalogoPage } from '@/pages/CatalogoPage';
+import { ProductoDetallePage } from '@/pages/ProductoDetallePage';
+import { CarritoPage } from '@/pages/CarritoPage';
 
-// Componentes stub temporales
-const HomePage = () => <div>HomePage - TODO</div>;
-const CatalogoPage = () => <div>CatalogoPage - TODO</div>;
-const ProductoDetallePage = () => <div>ProductoDetallePage - TODO</div>;
-const CarritoPage = () => <div>CarritoPage - TODO</div>;
-const PedidosPage = () => <div>PedidosPage - TODO</div>;
-const PedidoDetallePage = () => <div>PedidoDetallePage - TODO</div>;
-const CheckoutPage = () => <div>CheckoutPage - TODO</div>;
-const PagoMPPage = () => <div>PagoMPPage - TODO</div>;
-const PerfilPage = () => <div>PerfilPage - TODO</div>;
-const DireccionesPage = () => <div>DireccionesPage - TODO</div>;
+// Páginas protegidas (con auth)
+import { ProtectedRoute } from '@/features/auth';
+import { PedidosPage } from '@/pages/PedidosPage';
+import { PedidoDetallePage } from '@/pages/PedidoDetallePage';
+import { CheckoutPage } from '@/pages/CheckoutPage';
+import { PagoMPPage } from '@/pages/PagoMPPage';
+import { PagoExitosoPage } from '@/pages/PagoExitosoPage';
+import { PagoRechazadoPage } from '@/pages/PagoRechazadoPage';
+import { PerfilPage } from '@/pages/PerfilPage';
+import { DireccionesPage } from '@/pages/DireccionesPage';
 
-// Admin pages
-const AdminLayout = () => <div>AdminLayout - TODO</div>;
-const DashboardPage = () => <div>DashboardPage - TODO</div>;
-const ProductosAdminPage = () => <div>ProductosAdminPage - TODO</div>;
-const CategoriasAdminPage = () => <div>CategoriasAdminPage - TODO</div>;
-const UsuariosAdminPage = () => <div>UsuariosAdminPage - TODO</div>;
-const StockAdminPage = () => <div>StockAdminPage - TODO</div>;
-const PedidosAdminPage = () => <div>PedidosAdminPage - TODO</div>;
+// Admin
+import { AdminLayout } from '@/pages/admin/AdminLayout';
+import { DashboardPage } from '@/pages/admin/DashboardPage';
+import { ProductosAdminPage } from '@/pages/admin/ProductosAdminPage';
+import { CategoriasAdminPage } from '@/pages/admin/CategoriasAdminPage';
+import { UsuariosAdminPage } from '@/pages/admin/UsuariosAdminPage';
+import { StockAdminPage } from '@/pages/admin/StockAdminPage';
+import { PedidosAdminPage } from '@/pages/admin/PedidosAdminPage';
 
 export const router = createBrowserRouter([
   {
@@ -43,32 +48,44 @@ export const router = createBrowserRouter([
   },
   {
     path: '/pedidos',
-    element: <PedidosPage />,
+    element: <ProtectedRoute><PedidosPage /></ProtectedRoute>,
   },
   {
     path: '/pedidos/:id',
-    element: <PedidoDetallePage />,
+    element: <ProtectedRoute><PedidoDetallePage /></ProtectedRoute>,
   },
   {
     path: '/checkout',
-    element: <CheckoutPage />,
+    element: <ProtectedRoute><CheckoutPage /></ProtectedRoute>,
   },
   {
-    path: '/pago-mp/:pedidoId',
-    element: <PagoMPPage />,
+    path: '/pago-mp/:id',
+    element: <ProtectedRoute><PagoMPPage /></ProtectedRoute>,
+  },
+  {
+    path: '/pago-exitoso/:id',
+    element: <ProtectedRoute><PagoExitosoPage /></ProtectedRoute>,
+  },
+  {
+    path: '/pago-rechazado/:id',
+    element: <ProtectedRoute><PagoRechazadoPage /></ProtectedRoute>,
   },
   {
     path: '/perfil',
-    element: <PerfilPage />,
+    element: <ProtectedRoute><PerfilPage /></ProtectedRoute>,
   },
   {
     path: '/perfil/direcciones',
-    element: <DireccionesPage />,
+    element: <ProtectedRoute><DireccionesPage /></ProtectedRoute>,
   },
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: <ProtectedRoute><AdminLayout /></ProtectedRoute>,
     children: [
+      {
+        index: true,
+        element: <DashboardPage />,
+      },
       {
         path: 'dashboard',
         element: <DashboardPage />,
