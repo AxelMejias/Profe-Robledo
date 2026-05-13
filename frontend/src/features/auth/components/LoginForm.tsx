@@ -42,8 +42,8 @@ export function LoginForm() {
 
       addToast('success', 'Sesión iniciada correctamente');
 
-      // Redirigir a la ruta original o al catálogo
-      const redirectTo = searchParams.get('redirect') || '/catalogo';
+      // Redirigir a la ruta original o al home
+      const redirectTo = searchParams.get('redirect') || '/';
       navigate(redirectTo);
     } catch (err: any) {
       const raw = err.response?.data?.detail;

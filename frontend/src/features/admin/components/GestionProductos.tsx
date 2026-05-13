@@ -110,7 +110,9 @@ export function GestionProductos() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-semibold">${producto.precio_base}</span>
+                    <span className="font-semibold">
+                      ${new Intl.NumberFormat('es-AR').format(producto.precio_base)}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={producto.stock_cantidad === 0 ? 'text-danger font-semibold' : ''}>

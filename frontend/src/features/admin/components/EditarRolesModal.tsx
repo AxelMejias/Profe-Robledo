@@ -9,7 +9,7 @@ interface EditarRolesModalProps {
   onClose: () => void;
 }
 
-const ROLES_DISPONIBLES = ['ADMIN', 'STOCK', 'PEDIDOS', 'CLIENT'];
+const ROLES_DISPONIBLES = ['ADMIN', 'CLIENT'];
 
 export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
   const updateRolesMutation = useUpdateRoles();

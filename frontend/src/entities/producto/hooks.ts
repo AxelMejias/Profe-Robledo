@@ -6,7 +6,7 @@ interface UseProductosFilters {
   page?: number;
   size?: number;
   categoria_id?: number;
-  busqueda?: string;
+  search?: string;
   precio_min?: number;
   precio_max?: number;
   disponible?: boolean;

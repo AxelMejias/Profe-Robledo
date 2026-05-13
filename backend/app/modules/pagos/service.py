@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -7,12 +8,80 @@ from decimal import Decimal
 import mercadopago
 from fastapi import HTTPException, Request
 
+logger = logging.getLogger(__name__)
+
 from app.core.config import settings
 from app.core.uow import UnitOfWork
 from app.modules.pagos.model import Pago
-from app.modules.pagos.schemas import CrearPagoRequest, PagoRead, WebhookMP
+from app.modules.pagos.schemas import CrearPagoRequest, PagoRead, PreferenceResponse, WebhookMP
 from app.modules.pedidos.model import HistorialEstadoPedido
 from app.modules.usuarios.model import Usuario
+
+
+async def crear_preference(
+    uow: UnitOfWork,
+    pedido_id: int,
+    current_user: Usuario,
+) -> PreferenceResponse:
+    pedido = await uow.pedidos.get_by_id(pedido_id)
+    if pedido is None or pedido.usuario_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    if pedido.estado_codigo != "PENDIENTE":
+        raise HTTPException(status_code=400, detail="Solo se puede pagar un pedido PENDIENTE")
+
+    pago_existente = await uow.pagos.get_by_pedido(pedido_id)
+    if pago_existente and pago_existente.mp_status == "approved":
+        raise HTTPException(status_code=400, detail="Este pedido ya tiene un pago aprobado")
+
+    idempotency_key = str(uuid.uuid4())
+    external_reference = f"pedido-{pedido_id}-{idempotency_key[:8]}"
+
+    sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+    preference_data = {
+        "items": [
+            {
+                "title": f"Pedido #{pedido_id} — Food Store",
+                "quantity": 1,
+                "unit_price": float(pedido.total),
+                "currency_id": "ARS",
+            }
+        ],
+        "external_reference": external_reference,
+        "notification_url": settings.MP_NOTIFICATION_URL if settings.MP_NOTIFICATION_URL else None,
+        "back_urls": {
+            "success": f"{settings.FRONTEND_URL}/pago-exitoso/{pedido_id}",
+            "failure": f"{settings.FRONTEND_URL}/pago-rechazado/{pedido_id}",
+            "pending": f"{settings.FRONTEND_URL}/pedidos/{pedido_id}",
+        },
+    }
+
+    result = sdk.preference().create(preference_data)
+    logger.warning("MP preference result status=%s response=%s", result.get("status"), result.get("response"))
+
+    response = result.get("response", {})
+    mp_status = result.get("status", 0)
+
+    if mp_status not in (200, 201):
+        mp_error = response.get("message") or response.get("error") or str(response)
+        raise HTTPException(status_code=502, detail=f"MercadoPago error: {mp_error}")
+
+    init_point = response.get("sandbox_init_point" if settings.MP_SANDBOX else "init_point") or response.get("init_point")
+
+    if not init_point:
+        raise HTTPException(status_code=502, detail="MercadoPago no devolvió un link de pago")
+
+    await uow.pagos.create(
+        Pago(
+            pedido_id=pedido_id,
+            monto=pedido.total,
+            mp_payment_id=None,
+            mp_status="pending",
+            external_reference=external_reference,
+            idempotency_key=idempotency_key,
+        )
+    )
+
+    return PreferenceResponse(init_point=init_point)
 
 
 async def crear_pago(

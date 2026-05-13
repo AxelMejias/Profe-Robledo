@@ -95,9 +95,9 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
               <span className="text-2xl">✕</span>
               <div>
                 <p className="font-semibold text-danger">Pedido cancelado</p>
-                {historial.find((h) => h.estado_hacia === 'CANCELADO')?.observacion && (
+                {historial.find((h) => h.estado_hasta === 'CANCELADO')?.motivo && (
                   <p className="text-sm text-gray-600 mt-1">
-                    Motivo: {historial.find((h) => h.estado_hacia === 'CANCELADO')?.observacion}
+                    Motivo: {historial.find((h) => h.estado_hasta === 'CANCELADO')?.motivo}
                   </p>
                 )}
               </div>
@@ -109,7 +109,7 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
       {/* Timeline vertical (mobile) */}
       <div className="md:hidden space-y-4">
         {historial.map((item, idx) => {
-          const fecha = new Date(item.creado_en).toLocaleDateString('es-AR', {
+          const fecha = new Date(item.created_at).toLocaleDateString('es-AR', {
             day: '2-digit',
             month: '2-digit',
             hour: '2-digit',
@@ -129,7 +129,7 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
                       : 'bg-secondary text-white'
                   }`}
                 >
-                  {getEstadoIcon(item.estado_hacia)}
+                  {getEstadoIcon(item.estado_hasta)}
                 </div>
                 {!esUltimo && (
                   <div className="w-0.5 h-full bg-gray-300 my-2" />
@@ -140,14 +140,14 @@ export function PedidoTimeline({ historial, estadoActual }: PedidoTimelineProps)
               <div className="flex-1 pb-4">
                 <p className="font-semibold">
                   {item.estado_desde ? `${item.estado_desde} → ` : ''}
-                  {item.estado_hacia}
+                  {item.estado_hasta}
                 </p>
                 <p className="text-sm text-gray-600">{fecha}</p>
                 {item.usuario_id && (
                   <p className="text-xs text-gray-500">Por usuario #{item.usuario_id}</p>
                 )}
-                {item.observacion && (
-                  <p className="text-sm text-gray-600 italic mt-1">{item.observacion}</p>
+                {item.motivo && (
+                  <p className="text-sm text-gray-600 italic mt-1">{item.motivo}</p>
                 )}
               </div>
             </div>

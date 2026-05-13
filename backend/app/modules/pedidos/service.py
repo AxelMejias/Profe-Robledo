@@ -38,8 +38,18 @@ def _es_admin_pedidos(usuario: Usuario) -> bool:
     return "ADMIN" in r or "PEDIDOS" in r
 
 
-def _to_read(pedido: Pedido) -> PedidoRead:
-    return PedidoRead.model_validate(pedido)
+def _to_read(pedido: Pedido, usuario_nombre: Optional[str] = None) -> PedidoRead:
+    obj = PedidoRead.model_validate(pedido)
+    if usuario_nombre is not None:
+        obj.usuario_nombre = usuario_nombre
+    return obj
+
+
+async def _nombre_usuario(uow: UnitOfWork, usuario_id: int) -> str:
+    user = await uow.usuarios.get_by_id(usuario_id)
+    if user is None:
+        return f"Usuario #{usuario_id}"
+    return f"{user.nombre} {user.apellido}"
 
 
 async def get_list(
@@ -52,8 +62,14 @@ async def get_list(
     usuario_id_filter: Optional[int] = None if _es_admin_pedidos(current_user) else current_user.id
     pedidos, total = await uow.pedidos.list_paginated(page, size, usuario_id_filter, estado_codigo)
     pages = math.ceil(total / size) if size else 1
+
+    items = []
+    for p in pedidos:
+        nombre = await _nombre_usuario(uow, p.usuario_id)
+        items.append(_to_read(p, nombre))
+
     return PedidoListResponse(
-        items=[_to_read(p) for p in pedidos],
+        items=items,
         total=total,
         page=page,
         size=size,
@@ -74,9 +90,10 @@ async def get_detail(
 
     detalles = await uow.pedidos.get_detalles(pedido_id)
     historial = await uow.pedidos.get_historial(pedido_id)
+    nombre = await _nombre_usuario(uow, pedido.usuario_id)
 
     return PedidoDetail(
-        **_to_read(pedido).model_dump(),
+        **_to_read(pedido, nombre).model_dump(),
         items=[DetallePedidoRead.model_validate(d) for d in detalles],
         historial=[HistorialRead.model_validate(h) for h in historial],
     )

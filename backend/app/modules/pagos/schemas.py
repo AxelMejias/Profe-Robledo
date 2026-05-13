@@ -24,6 +24,10 @@ class PagoRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PreferenceResponse(BaseModel):
+    init_point: str
+
+
 class WebhookMP(BaseModel):
     action: Optional[str] = None
     api_version: Optional[str] = None

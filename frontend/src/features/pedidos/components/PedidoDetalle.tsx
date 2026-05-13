@@ -110,9 +110,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
     }
   };
 
-  const direccionSnapshot = pedido.direccion_snapshot
-    ? JSON.parse(pedido.direccion_snapshot)
-    : null;
+  const direccionSnapshot = pedido.direccion_snapshot ?? null;
 
   const fecha = new Date(pedido.creado_en).toLocaleDateString('es-AR', {
     day: '2-digit',
@@ -165,26 +163,50 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
         />
       )}
 
+      {/* Info cliente + medio de pago (solo visible para admin/pedidos) */}
+      {(isAdminOrPedidos || pedido.usuario_nombre) && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-3">Información de la compra</h2>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            {pedido.usuario_nombre && (
+              <div>
+                <p className="text-gray-500 font-medium">Cliente</p>
+                <p className="text-gray-900">{pedido.usuario_nombre}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-gray-500 font-medium">Medio de pago</p>
+              <p className="text-gray-900">{pedido.forma_pago_codigo}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Items del pedido */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Productos</h2>
         <div className="space-y-4">
-          {pedido.detalles?.map((detalle) => (
-            <div key={detalle.id} className="flex justify-between items-start border-b pb-4">
+          {pedido.items?.map((detalle) => (
+            <div key={detalle.producto_id} className="flex justify-between items-start border-b pb-4 last:border-b-0">
               <div className="flex-1">
                 <p className="font-medium">{detalle.nombre_snapshot}</p>
-                {detalle.personalizacion.length > 0 && (
+                {detalle.personalizacion && detalle.personalizacion.length > 0 && (
                   <p className="text-sm text-gray-600">
                     Sin: {detalle.personalizacion.length} ingrediente(s)
                   </p>
                 )}
                 <p className="text-sm text-gray-600">
-                  ${detalle.precio_snapshot} × {detalle.cantidad}
+                  ${new Intl.NumberFormat('es-AR').format(Number(detalle.precio_snapshot))} × {detalle.cantidad}
                 </p>
               </div>
-              <p className="font-semibold text-primary-500">${detalle.subtotal}</p>
+              <p className="font-semibold text-primary-500">
+                ${new Intl.NumberFormat('es-AR').format(Number(detalle.subtotal))}
+              </p>
             </div>
           ))}
+          {(!pedido.items || pedido.items.length === 0) && (
+            <p className="text-sm text-gray-500">No hay productos registrados.</p>
+          )}
         </div>
       </div>
 
@@ -192,21 +214,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
       {direccionSnapshot && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold mb-4">Dirección de entrega</h2>
-          <div className="text-gray-700">
-            {direccionSnapshot.alias && (
-              <p className="font-medium">{direccionSnapshot.alias}</p>
-            )}
-            <p>{direccionSnapshot.linea1}</p>
-            {direccionSnapshot.linea2 && <p>{direccionSnapshot.linea2}</p>}
-            <p>
-              {direccionSnapshot.ciudad}, CP {direccionSnapshot.codigo_postal}
-            </p>
-            {direccionSnapshot.referencia && (
-              <p className="text-sm text-gray-600 mt-2">
-                Referencia: {direccionSnapshot.referencia}
-              </p>
-            )}
-          </div>
+          <p className="text-gray-700">{direccionSnapshot}</p>
         </div>
       )}
 

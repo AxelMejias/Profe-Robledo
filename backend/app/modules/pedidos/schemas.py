@@ -68,6 +68,8 @@ class PedidoRead(BaseModel):
     forma_pago_codigo: str
     notas: Optional[str] = None
     creado_en: datetime
+    direccion_snapshot: Optional[str] = None
+    usuario_nombre: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

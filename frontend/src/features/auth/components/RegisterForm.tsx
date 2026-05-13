@@ -64,7 +64,7 @@ export function RegisterForm() {
       });
 
       addToast('success', '¡Cuenta creada exitosamente!');
-      navigate('/catalogo');
+      navigate('/');
     } catch (err: any) {
       const raw = err.response?.data?.detail;
       const msg = raw ? (Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : String(raw)) : 'Error al crear la cuenta';

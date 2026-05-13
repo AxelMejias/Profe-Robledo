@@ -13,6 +13,21 @@ export const api = axios.create({
   baseURL: (import.meta.env.VITE_API_URL ?? "http://localhost:8000") + "/api/v1",
   headers: { "Content-Type": "application/json" },
   timeout: 15_000,
+  paramsSerializer: {
+    // FastAPI espera arrays repetidos: ?k=1&k=2 (sin corchetes)
+    serialize: (params: Record<string, unknown>) => {
+      const usp = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (Array.isArray(value)) {
+          value.forEach((v) => usp.append(key, String(v)));
+        } else {
+          usp.set(key, String(value));
+        }
+      });
+      return usp.toString();
+    },
+  },
 });
 
 // ---------------------------------------------------------------------------

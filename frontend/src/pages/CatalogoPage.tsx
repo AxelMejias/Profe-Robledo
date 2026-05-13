@@ -10,7 +10,7 @@ export function CatalogoPage() {
   );
   const [busqueda, setBusqueda] = useState('');
   const [precioMin, setPrecioMin] = useState(0);
-  const [precioMax, setPrecioMax] = useState(5000);
+  const [precioMax, setPrecioMax] = useState(0);
   const [excluirAlergenos, setExcluirAlergenos] = useState<number[]>([]);
 
   const handleCategoriaChange = (id?: number) => {
@@ -56,9 +56,9 @@ export function CatalogoPage() {
               page,
               size: 12,
               categoria_id: categoriaId,
-              busqueda: busqueda || undefined,
+              search: busqueda || undefined,
               precio_min: precioMin > 0 ? precioMin : undefined,
-              precio_max: precioMax < 5000 ? precioMax : undefined,
+              precio_max: precioMax > 0 ? precioMax : undefined,
               excluir_alergenos: excluirAlergenos.length > 0 ? excluirAlergenos : undefined,
             }}
             onPageChange={setPage}

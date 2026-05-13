@@ -34,8 +34,11 @@ export function Navigation() {
 
             {isAuthenticated && (
               <>
-                <Link to="/pedidos" className="hover:text-primary-500 transition-colors">
-                  Mis Pedidos
+                <Link
+                  to={hasRole('ADMIN') ? '/ventas' : '/pedidos'}
+                  className="hover:text-primary-500 transition-colors"
+                >
+                  {hasRole('ADMIN') ? 'Ventas' : 'Mis Pedidos'}
                 </Link>
 
                 <Link to="/carrito" className="relative hover:text-primary-500 transition-colors">

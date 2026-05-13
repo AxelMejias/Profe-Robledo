@@ -34,6 +34,21 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
   );
   const currentIngIds = new Set(producto?.ingredientes?.map((i) => i.id) ?? []);
   const [selectedIngs, setSelectedIngs] = useState<Set<number>>(new Set(currentIngIds));
+  const [showIngSearch, setShowIngSearch] = useState(false);
+  const [ingSearch, setIngSearch] = useState('');
+  const [catsOpen, setCatsOpen] = useState(false);
+  const [ingsOpen, setIngsOpen] = useState(false);
+
+  const formatPrecio = (n: number) =>
+    n > 0 ? new Intl.NumberFormat('es-AR').format(n) : '';
+  const parsePrecio = (raw: string): number => {
+    // Elimina puntos (separador de miles AR) y convierte coma decimal
+    const normalized = raw.replace(/\./g, '').replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const [rawPrecio, setRawPrecio] = useState(formatPrecio(producto?.precio_base ?? 0));
 
   const form = useForm({
     defaultValues: {
@@ -61,25 +76,34 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
           addToast('success', 'Producto creado correctamente');
         }
 
-        // Asignar categorías
-        await assignCatsMutation.mutateAsync({ id: savedId, categoria_ids: selectedCats });
+        // Asignar categorías solo si: es nuevo, o si el producto ya traía sus categorías cargadas
+        // (evita borrar la asignación cuando la lista no incluye ese campo)
+        const debeActualizarCats = !isEditing || producto.categorias !== undefined;
+        if (debeActualizarCats) {
+          await assignCatsMutation.mutateAsync({ id: savedId, categoria_ids: selectedCats });
+        }
 
         // Sincronizar ingredientes: agregar los nuevos, quitar los removidos
-        const prevIds = isEditing
-          ? new Set(producto.ingredientes?.map((i) => i.id) ?? [])
-          : new Set<number>();
+        // Solo si el producto ya traía sus ingredientes cargados (misma razón)
+        const prevIds =
+          isEditing && producto.ingredientes !== undefined
+            ? new Set(producto.ingredientes.map((i) => i.id))
+            : isEditing
+            ? null // ingredientes no cargados → no tocar
+            : new Set<number>();
 
-        const toAdd = [...selectedIngs].filter((id) => !prevIds.has(id));
-        const toRemove = [...prevIds].filter((id) => !selectedIngs.has(id));
-
-        await Promise.all([
-          ...toAdd.map((ingrediente_id) =>
-            addIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
-          ),
-          ...toRemove.map((ingrediente_id) =>
-            removeIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
-          ),
-        ]);
+        if (prevIds !== null) {
+          const toAdd = [...selectedIngs].filter((id) => !prevIds.has(id));
+          const toRemove = [...prevIds].filter((id) => !selectedIngs.has(id));
+          await Promise.all([
+            ...toAdd.map((ingrediente_id) =>
+              addIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+            ),
+            ...toRemove.map((ingrediente_id) =>
+              removeIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+            ),
+          ]);
+        }
 
         onClose();
       } catch (error: any) {
@@ -165,11 +189,14 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                   Precio <span className="text-danger">*</span>
                 </label>
                 <Input
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Ej: 18.000"
+                  value={rawPrecio}
+                  onChange={(e) => {
+                    setRawPrecio(e.target.value);
+                    field.handleChange(parsePrecio(e.target.value));
+                  }}
                   onBlur={field.handleBlur}
                 />
                 {field.state.meta.errors.length > 0 && (
@@ -233,70 +260,126 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
           )}
         />
 
-        {/* Categorías */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Categorías
-          </label>
-          <div className="max-h-48 overflow-y-auto space-y-2 border rounded-lg p-3">
-            {categorias?.length === 0 && (
-              <p className="text-sm text-gray-500">No hay categorías disponibles</p>
-            )}
-            {categorias?.map((cat) => (
-              <label key={cat.id} className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1">
-                <input
-                  type="checkbox"
-                  checked={selectedCats.includes(cat.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedCats((prev) => [...prev, cat.id]);
-                    } else {
-                      setSelectedCats((prev) => prev.filter((id) => id !== cat.id));
-                    }
-                  }}
-                  className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <span className="text-sm">{cat.nombre}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Ingredientes */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Ingredientes
-          </label>
-          <div className="max-h-48 overflow-y-auto space-y-2 border rounded-lg p-3">
-            {!todosIngredientes || todosIngredientes.length === 0 ? (
-              <p className="text-sm text-gray-500">No hay ingredientes disponibles</p>
-            ) : (
-              todosIngredientes.map((ing) => (
-                <label
-                  key={ing.id}
-                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1"
-                >
+        {/* Categorías — colapsable */}
+        <div className="border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setCatsOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700">
+              Categorías
+              {selectedCats.length > 0 && (
+                <span className="ml-2 text-xs text-primary-500 font-semibold">
+                  ({selectedCats.length} seleccionada{selectedCats.length !== 1 ? 's' : ''})
+                </span>
+              )}
+            </span>
+            <span className={`text-gray-400 transition-transform duration-200 ${catsOpen ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          </button>
+          {catsOpen && (
+            <div className="max-h-48 overflow-y-auto space-y-2 p-3">
+              {categorias?.length === 0 && (
+                <p className="text-sm text-gray-500">No hay categorías disponibles</p>
+              )}
+              {categorias?.map((cat) => (
+                <label key={cat.id} className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1">
                   <input
                     type="checkbox"
-                    checked={selectedIngs.has(ing.id)}
+                    checked={selectedCats.includes(cat.id)}
                     onChange={(e) => {
-                      setSelectedIngs((prev) => {
-                        const next = new Set(prev);
-                        if (e.target.checked) next.add(ing.id);
-                        else next.delete(ing.id);
-                        return next;
-                      });
+                      if (e.target.checked) {
+                        setSelectedCats((prev) => [...prev, cat.id]);
+                      } else {
+                        setSelectedCats((prev) => prev.filter((id) => id !== cat.id));
+                      }
                     }}
                     className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                   />
-                  <span className="text-sm flex-1">{ing.nombre}</span>
-                  {ing.es_alergeno && (
-                    <Badge variant="danger" size="sm">Alérgeno</Badge>
-                  )}
+                  <span className="text-sm">{cat.nombre}</span>
                 </label>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Ingredientes — colapsable */}
+        <div className="border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => { setIngsOpen((v) => !v); if (ingsOpen) { setShowIngSearch(false); setIngSearch(''); } }}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700">
+              Ingredientes
+              {selectedIngs.size > 0 && (
+                <span className="ml-2 text-xs text-primary-500 font-semibold">
+                  ({selectedIngs.size} seleccionado{selectedIngs.size !== 1 ? 's' : ''})
+                </span>
+              )}
+            </span>
+            <div className="flex items-center gap-2">
+              {ingsOpen && (
+                <span
+                  role="button"
+                  onClick={(e) => { e.stopPropagation(); setShowIngSearch((v) => !v); setIngSearch(''); }}
+                  className="text-gray-400 hover:text-primary-500 transition-colors text-base"
+                  title="Buscar ingrediente"
+                >
+                  🔍
+                </span>
+              )}
+              <span className={`text-gray-400 transition-transform duration-200 ${ingsOpen ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+            </div>
+          </button>
+          {ingsOpen && (
+            <div className="p-3 space-y-2">
+              {showIngSearch && (
+                <Input
+                  value={ingSearch}
+                  onChange={(e) => setIngSearch(e.target.value)}
+                  placeholder="Buscar ingrediente..."
+                  className="mb-2"
+                />
+              )}
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {!todosIngredientes || todosIngredientes.length === 0 ? (
+                  <p className="text-sm text-gray-500">No hay ingredientes disponibles</p>
+                ) : (
+                  todosIngredientes
+                    .filter((ing) => ing.nombre.toLowerCase().includes(ingSearch.toLowerCase()))
+                    .map((ing) => (
+                      <label
+                        key={ing.id}
+                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedIngs.has(ing.id)}
+                          onChange={(e) => {
+                            setSelectedIngs((prev) => {
+                              const next = new Set(prev);
+                              if (e.target.checked) next.add(ing.id);
+                              else next.delete(ing.id);
+                              return next;
+                            });
+                          }}
+                          className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                        />
+                        <span className="text-sm flex-1">{ing.nombre}</span>
+                        {ing.es_alergeno && (
+                          <Badge variant="danger" size="sm">Alérgeno</Badge>
+                        )}
+                      </label>
+                    ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 justify-end pt-4 border-t">

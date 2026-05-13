@@ -20,6 +20,7 @@ import { PagoExitosoPage } from '@/pages/PagoExitosoPage';
 import { PagoRechazadoPage } from '@/pages/PagoRechazadoPage';
 import { PerfilPage } from '@/pages/PerfilPage';
 import { DireccionesPage } from '@/pages/DireccionesPage';
+import { VentasPage } from '@/pages/VentasPage';
 
 // Admin
 import { AdminLayout } from '@/pages/admin/AdminLayout';
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
       { path: '/pago-rechazado/:id', element: <ProtectedRoute><PagoRechazadoPage /></ProtectedRoute> },
       { path: '/perfil', element: <ProtectedRoute><PerfilPage /></ProtectedRoute> },
       { path: '/perfil/direcciones', element: <ProtectedRoute><DireccionesPage /></ProtectedRoute> },
+      { path: '/ventas', element: <ProtectedRoute><VentasPage /></ProtectedRoute> },
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
       { path: '*', element: <NotFoundPage /> },

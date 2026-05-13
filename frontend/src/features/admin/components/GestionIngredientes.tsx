@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from '@tanstack/react-form';
+import * as XLSX from 'xlsx';
 import {
   useIngredientes,
   useCreateIngrediente,
@@ -8,6 +9,7 @@ import {
 } from '@/entities/ingrediente/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Badge, Skeleton, EmptyState, Modal, Input } from '@/shared/ui';
+import { ingredientesApi } from '@/entities/ingrediente/api';
 import type { Ingrediente } from '@/shared/types';
 
 function FormIngrediente({
@@ -133,13 +135,60 @@ function FormIngrediente({
 }
 
 export function GestionIngredientes() {
-  const { data: ingredientes, isLoading } = useIngredientes();
+  const { data: ingredientes, isLoading, refetch } = useIngredientes();
   const deleteMutation = useDeleteIngrediente();
   const addToast = useUIStore((s) => s.addToast);
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Ingrediente | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      if (rows.length === 0) {
+        addToast('error', 'El archivo está vacío o no tiene el formato correcto');
+        return;
+      }
+
+      let creados = 0;
+      let errores = 0;
+
+      for (const row of rows) {
+        const nombre = String(row['nombre'] || row['Nombre'] || '').trim();
+        if (!nombre) continue;
+
+        const descripcion = String(row['descripcion'] || row['Descripción'] || row['Descripcion'] || '').trim() || undefined;
+        const raw = String(row['es_alergeno'] || row['Es alérgeno'] || row['alergeno'] || '').trim().toLowerCase();
+        const es_alergeno = ['true', '1', 'si', 'sí', 'yes', 'verdadero'].includes(raw);
+
+        try {
+          await ingredientesApi.createIngrediente({ nombre, descripcion, es_alergeno });
+          creados++;
+        } catch {
+          errores++;
+        }
+      }
+
+      addToast('success', `Importación completa: ${creados} creados${errores > 0 ? `, ${errores} errores` : ''}`);
+      refetch();
+    } catch {
+      addToast('error', 'Error al leer el archivo Excel');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleDelete = async (id: number) => {
     try {
@@ -169,7 +218,23 @@ export function GestionIngredientes() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Gestión de Ingredientes</h1>
-        <Button onClick={() => setShowForm(true)}>+ Nuevo Ingrediente</Button>
+        <div className="flex gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleImportExcel}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="ghost"
+            disabled={importing}
+          >
+            {importing ? 'Importando...' : '📥 Importar Excel'}
+          </Button>
+          <Button onClick={() => setShowForm(true)}>+ Nuevo Ingrediente</Button>
+        </div>
       </div>
 
       {!ingredientes || ingredientes.length === 0 ? (

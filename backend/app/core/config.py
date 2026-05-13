@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     MP_PUBLIC_KEY: str = ""
     MP_NOTIFICATION_URL: str = ""
     MP_WEBHOOK_SECRET: str = ""
+    MP_SANDBOX: bool = True
+    FRONTEND_URL: str = "http://localhost:5173"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

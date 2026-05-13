@@ -91,24 +91,24 @@ export interface EstadoPedido {
 }
 
 export interface DetallePedido {
-  id: number;
-  pedido_id: number;
+  id?: number;
+  pedido_id?: number;
   producto_id: number;
   nombre_snapshot: string;
   precio_snapshot: number;
   cantidad: number;
   subtotal: number;
-  personalizacion: number[]; // IDs de ingredientes excluidos
+  personalizacion?: number[];
 }
 
 export interface HistorialEstadoPedido {
   id: number;
-  pedido_id: number;
-  estado_desde?: string; // NULL para la primera transición
-  estado_hacia: string;
-  usuario_id?: number; // NULL si fue el sistema
-  observacion?: string;
-  creado_en: string;
+  pedido_id?: number;
+  estado_desde?: string;
+  estado_hasta: string;
+  usuario_id?: number;
+  motivo?: string;
+  created_at: string;
 }
 
 export interface Pedido {
@@ -116,18 +116,19 @@ export interface Pedido {
   usuario_id: number;
   estado_codigo: string;
   direccion_id?: number;
-  direccion_snapshot?: string; // JSON serializado
+  direccion_snapshot?: string;
   forma_pago_codigo: string;
   subtotal: number;
-  descuento: number;
+  descuento?: number;
   costo_envio: number;
   total: number;
   notas?: string;
   creado_en: string;
-  actualizado_en: string;
+  actualizado_en?: string;
   eliminado_en?: string;
+  usuario_nombre?: string;
   // Relaciones expandidas (cuando se solicita detalle)
-  detalles?: DetallePedido[];
+  items?: DetallePedido[];
   historial?: HistorialEstadoPedido[];
   pagos?: Pago[];
 }

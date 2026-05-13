@@ -7,7 +7,7 @@ interface CatalogoGridProps {
     page?: number;
     size?: number;
     categoria_id?: number;
-    busqueda?: string;
+    search?: string;
     precio_min?: number;
     precio_max?: number;
     excluir_alergenos?: number[];
@@ -20,7 +20,7 @@ export function CatalogoGrid({ filters = {}, onPageChange }: CatalogoGridProps) 
     page: filters.page ?? 1,
     size: filters.size ?? 12,
     categoria_id: filters.categoria_id,
-    busqueda: filters.busqueda,
+    search: filters.search,
     precio_min: filters.precio_min,
     precio_max: filters.precio_max,
     excluir_alergenos: filters.excluir_alergenos,

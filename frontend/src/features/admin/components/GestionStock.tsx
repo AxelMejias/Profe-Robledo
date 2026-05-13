@@ -3,6 +3,13 @@ import { useProductos, useUpdateStock } from '@/entities/producto/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Skeleton, Button, Input } from '@/shared/ui';
 
+const stockBadge = (qty: number) => {
+  if (qty < 10)  return { label: 'Bajo',  cls: 'bg-red-100 text-red-700' };
+  if (qty < 50)  return { label: 'Medio', cls: 'bg-orange-100 text-orange-700' };
+  if (qty > 100) return { label: 'Alto',  cls: 'bg-green-100 text-green-700' };
+  return null;
+};
+
 export function GestionStock() {
   const { data, isLoading } = useProductos({ size: 50 });
   const updateStockMutation = useUpdateStock();
@@ -75,9 +82,19 @@ export function GestionStock() {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`font-semibold ${producto.stock_cantidad === 0 ? 'text-danger' : ''}`}>
-                    {producto.stock_cantidad}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-semibold ${producto.stock_cantidad === 0 ? 'text-danger' : ''}`}>
+                      {producto.stock_cantidad}
+                    </span>
+                    {(() => {
+                      const badge = stockBadge(producto.stock_cantidad);
+                      return badge ? (
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.cls}`}>
+                          {badge.label}
+                        </span>
+                      ) : null;
+                    })()}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <Input

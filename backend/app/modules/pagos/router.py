@@ -3,10 +3,19 @@ from fastapi import APIRouter, Depends, Request
 from app.core.deps import get_current_user
 from app.core.uow import UnitOfWork
 from app.modules.pagos import service as pagos_service
-from app.modules.pagos.schemas import CrearPagoRequest, PagoRead, WebhookMP
+from app.modules.pagos.schemas import CrearPagoRequest, PagoRead, PreferenceResponse, WebhookMP
 from app.modules.usuarios.model import Usuario
 
 router = APIRouter(prefix="/pagos", tags=["pagos"])
+
+
+@router.post("/preference", response_model=PreferenceResponse, status_code=201)
+async def crear_preference(
+    pedido_id: int,
+    current_user: Usuario = Depends(get_current_user),
+) -> PreferenceResponse:
+    async with UnitOfWork() as uow:
+        return await pagos_service.crear_preference(uow, pedido_id, current_user)
 
 
 @router.post("/crear", response_model=PagoRead, status_code=201)

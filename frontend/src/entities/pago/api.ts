@@ -7,6 +7,11 @@ interface CrearPagoRequest {
 }
 
 export const pagosApi = {
+  crearPreference: async (pedido_id: number): Promise<{ init_point: string }> => {
+    const { data } = await api.post('/pagos/preference', null, { params: { pedido_id } });
+    return data;
+  },
+
   crearPago: async (payload: CrearPagoRequest): Promise<Pago> => {
     const { data } = await api.post('/pagos/crear', payload);
     return data;

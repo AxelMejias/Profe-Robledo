@@ -8,10 +8,10 @@ export function HomePage() {
   return (
     <div className="space-y-12">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-primary to-secondary text-white py-20 px-6 rounded-lg">
+      <section className="bg-gradient-to-r from-primary to-secondary py-20 px-6 rounded-lg">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6">Bienvenido a Food Store</h1>
-          <p className="text-xl mb-8">
+          <h1 className="text-5xl font-bold mb-6 text-gray-900">Bienvenido a Food Store</h1>
+          <p className="text-xl mb-8 text-gray-900">
             Los mejores productos alimenticios al alcance de un clic
           </p>
           <Link to="/catalogo">

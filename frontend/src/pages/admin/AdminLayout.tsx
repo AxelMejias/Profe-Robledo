@@ -38,7 +38,12 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md">
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-primary-500 mb-6">Admin Panel</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-primary-500">Admin Panel</h2>
+            <Link to="/" title="Ir al inicio" className="text-gray-400 hover:text-primary-500 transition-colors text-xl">
+              🏠
+            </Link>
+          </div>
           <nav className="space-y-2">
             {menuItems.map((item) => (
               <Link

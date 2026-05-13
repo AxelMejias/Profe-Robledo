@@ -6,6 +6,12 @@ interface CrearPagoRequest {
   token: string;
 }
 
+export function useCrearPreference() {
+  return useMutation({
+    mutationFn: (pedido_id: number) => pagosApi.crearPreference(pedido_id),
+  });
+}
+
 export function useCrearPago() {
   const queryClient = useQueryClient();
 
