@@ -2,6 +2,7 @@ import { useKPIs } from '@/entities/admin/hooks';
 import { Skeleton } from '@/shared/ui';
 import { GraficoIngresos7Dias } from './GraficoIngresos7Dias';
 import { GraficoPedidosPorEstado } from './GraficoPedidosPorEstado';
+import { GraficoTopProductos } from './GraficoTopProductos';
 
 export function Dashboard() {
   const { data: kpis, isLoading } = useKPIs();
@@ -51,6 +52,9 @@ export function Dashboard() {
         <GraficoIngresos7Dias />
         <GraficoPedidosPorEstado />
       </div>
+
+      {/* Top productos */}
+      <GraficoTopProductos />
     </div>
   );
 }

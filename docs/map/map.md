@@ -169,11 +169,68 @@
 
 ---
 
+---
+
+## 🖥️ FRONTEND COMPLETO
+
+### 10. `us-009-frontend` ✅ ARCHIVADO
+
+**Funcionalidad:** Frontend completo con Feature-Sliced Design — reemplaza el demo monolítico de 395 líneas. Cubre el 100% de las funcionalidades del backend.
+**Dependencias:** `us-000` al `us-008` (backend completo)
+**Stack:** React 18 + TypeScript strict · Vite · TanStack Query v5 · TanStack Form · Zustand · Axios · Tailwind CSS · Recharts · @mercadopago/sdk-react
+
+#### Shared Layer
+- [x] Tipos TypeScript de dominio en `shared/types/` — Usuario, Producto, Categoria, Pedido, Pago, DireccionEntrega
+- [x] `shared/ui/` — Button, Input, Modal, Toast, Skeleton, EmptyState, Badge
+- [x] Stores Zustand ajustados — `authStore` (hasRole), `cartStore`, `paymentStore`, `uiStore` (toasts)
+
+#### Entities — TanStack Query hooks
+- [x] `entities/producto` — `useProductos(filters)`, `useProducto(id)`, mutations CRUD + stock
+- [x] `entities/categoria` — `useCategorias`, mutations CRUD
+- [x] `entities/pedido` — `usePedidos`, `usePedido`, `useCreatePedido`, `useAvanzarEstado`, `useCancelarPedido`
+- [x] `entities/pago` — `useCrearPago`, `usePagosByPedido`
+- [x] `entities/direccion` — `useDirecciones`, CRUD + `useMarcarPrincipal`
+- [x] `entities/usuario` — `useUsuarios` (admin), `useUpdateRoles`
+- [x] `entities/admin` — `useKPIs`, `useMetricasPorEstado`, `useIngresos7Dias`
+
+#### Features
+- [x] **auth** — `LoginForm`, `RegisterForm`, `ProtectedRoute`, `RoleGuard`, `LogoutButton`
+- [x] **store** — `CatalogoGrid`, `ProductoCard`, `FiltrosCatalogo` (debounce 500ms), `ProductoDetalle`, `PersonalizacionModal`, `CartDrawer` con validación server-side
+- [x] **pedidos** — `PedidosList`, `PedidoDetalle`, `PedidoTimeline` (FSM visual), `CrearPedidoForm`, polling 30s
+- [x] **pagos** — `CheckoutMP` (CardPayment SDK), `EstadoPago`, polling 5s post-pago, `PagoExitoso`, `PagoRechazado`, `HistorialPagos`
+- [x] **direcciones** — `ListaDirecciones`, `FormDireccion`, `SeleccionarDireccion`
+- [x] **perfil** — `PerfilUsuario`, `PedidosRecientes`
+- [x] **admin** — Dashboard KPIs, `GraficoIngresos7Dias` (Recharts LineChart), `GraficoPedidosPorEstado` (BarChart), `GestionProductos`, `FormProducto` (M2M categorías+ingredientes), `GestionCategorias`, `FormCategoria`, `GestionUsuarios`, `EditarRolesModal` (RN-RB04), `GestionStock`, `GestionPedidos`
+
+#### Pages — 20 rutas
+- [x] Públicas: `/` (HomePage), `/catalogo`, `/producto/:id`, `/login`, `/register`, `/404`
+- [x] Protegidas (CLIENT+): `/carrito`, `/checkout`, `/pago`, `/pedidos`, `/pedidos/:id`, `/perfil`, `/perfil/direcciones`, `/pago/exitoso`, `/pago/rechazado`
+- [x] Admin (ADMIN): `/admin/*` con `AdminLayout` + sidebar — Dashboard, Productos, Categorías, Stock, Usuarios, Pedidos
+
+#### Widgets
+- [x] `Navigation` — navbar responsive, badge carrito, dropdown usuario con rol
+- [x] `Sidebar` — drawer mobile con menú
+- [x] `CheckoutFlow` — wizard multi-step (validar carrito → dirección → forma de pago → confirmar)
+- [x] `RootLayout` — envuelve Navigation + ToastContainer
+
+#### Bugfixes post-implementación (integrados al archive)
+- [x] `fix`: `bg-primary` → `bg-primary-500` en Tailwind (compatibilidad tema custom)
+- [x] `fix`: errores Pydantic (array `detail`) convertidos a string en Toast/Login/Register
+- [x] `fix`: `location.reload()` → `setState` en PerfilUsuario
+- [x] `fix`: `PATCH /auth/me` para editar perfil + `update_profile` usa `get_by_id + update(entity)`
+- [x] `fix`: router con stubs → páginas reales + ProtectedRoute
+- [x] `fix`: FSM `PENDIENTE→CONFIRMADO` ahora descuenta stock correctamente
+- [x] `fix`: filtro estado pedidos, `avanzar_estado` con `nuevo_estado`, rango precio catálogo
+- [x] `feat`: `GET /usuarios` — listar usuarios desde panel admin
+
+---
+
 ## ✔ Estado del proyecto
 
-- Total changes: 9
-- Archivados: 9 (us-000 → us-008)
+- Total changes: 10
+- Archivados: 10 (us-000 → us-009)
 - Implementados: 0
 - Pendientes: 0
-- Arquitectura: Feature-First backend + Feature-Sliced Design frontend ✔
-- Patrones: BaseRepository[T] + UoW + soft delete + snapshot + FSM ✔
+- Backend: 100% completo — Feature-First, 9 módulos, FSM, MercadoPago, RBAC ✔
+- Frontend: 100% completo — Feature-Sliced Design, 20 páginas, 8 features ✔
+- Patrones: BaseRepository[T] + UoW + soft delete + snapshot + FSM + TanStack Query + Zustand ✔

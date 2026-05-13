@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUsuarios } from '@/entities/usuario/hooks';
+import { useUsuarios, useToggleEstadoUsuario } from '@/entities/usuario/hooks';
 import { Skeleton, EmptyState, Badge } from '@/shared/ui';
 import { EditarRolesModal } from './EditarRolesModal';
 import type { Usuario } from '@/shared/types';
@@ -14,6 +14,7 @@ const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'gray'> =
 export function GestionUsuarios() {
   const { data: usuarios, isLoading } = useUsuarios();
   const [editingUsuario, setEditingUsuario] = useState<Usuario | null>(null);
+  const toggleEstado = useToggleEstadoUsuario();
 
   if (isLoading) {
     return <Skeleton className="h-96" />;
@@ -40,6 +41,9 @@ export function GestionUsuarios() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Roles
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Estado
+              </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                 Acciones
               </th>
@@ -65,6 +69,18 @@ export function GestionUsuarios() {
                       </Badge>
                     ))}
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => toggleEstado.mutate({ id: usuario.id, activo: !usuario.activo })}
+                    disabled={toggleEstado.isPending}
+                    title={usuario.activo ? 'Click para desactivar' : 'Click para activar'}
+                    className="cursor-pointer disabled:opacity-50"
+                  >
+                    <Badge variant={usuario.activo ? 'primary' : 'gray'} size="sm">
+                      {usuario.activo ? 'Activo' : 'Inactivo'}
+                    </Badge>
+                  </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <button

@@ -6,7 +6,7 @@ from app.core.deps import get_current_user, require_role
 from app.core.uow import UnitOfWork
 from app.modules.usuarios import service as usuario_service
 from app.modules.usuarios.model import Usuario
-from app.modules.usuarios.schemas import AssignRolesRequest, PaginatedUsers, UserRolesResponse
+from app.modules.usuarios.schemas import AssignRolesRequest, PaginatedUsers, ToggleEstadoRequest, UserRead, UserRolesResponse
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -29,3 +29,13 @@ async def assign_roles(
 ) -> UserRolesResponse:
     async with UnitOfWork() as uow:
         return await usuario_service.set_roles(uow, usuario_id, body, current_user)
+
+
+@router.patch("/{usuario_id}/estado", response_model=UserRead)
+async def toggle_estado(
+    usuario_id: int,
+    body: ToggleEstadoRequest,
+    current_user: Usuario = Depends(require_role(["ADMIN"])),
+) -> UserRead:
+    async with UnitOfWork() as uow:
+        return await usuario_service.toggle_estado(uow, usuario_id, body, current_user.id)

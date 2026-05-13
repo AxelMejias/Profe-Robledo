@@ -11,6 +11,7 @@ export function CatalogoPage() {
   const [busqueda, setBusqueda] = useState('');
   const [precioMin, setPrecioMin] = useState(0);
   const [precioMax, setPrecioMax] = useState(5000);
+  const [excluirAlergenos, setExcluirAlergenos] = useState<number[]>([]);
 
   const handleCategoriaChange = (id?: number) => {
     setCategoriaId(id);
@@ -45,6 +46,7 @@ export function CatalogoPage() {
             onCategoriaChange={handleCategoriaChange}
             onBusquedaChange={handleBusquedaChange}
             onPrecioChange={handlePrecioChange}
+            onAlergenos={(ids) => { setExcluirAlergenos(ids); setPage(1); }}
           />
         </aside>
 
@@ -57,6 +59,7 @@ export function CatalogoPage() {
               busqueda: busqueda || undefined,
               precio_min: precioMin > 0 ? precioMin : undefined,
               precio_max: precioMax < 5000 ? precioMax : undefined,
+              excluir_alergenos: excluirAlergenos.length > 0 ? excluirAlergenos : undefined,
             }}
             onPageChange={setPage}
           />

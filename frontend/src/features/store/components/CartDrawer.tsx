@@ -23,6 +23,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
   const addToast = useUIStore((s) => s.addToast);
 
   const [isValidating, setIsValidating] = useState(false);
+  const [advertencias, setAdvertencias] = useState<string[]>([]);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
   const [showConfirmRemove, setShowConfirmRemove] = useState<number | null>(null);
 
@@ -35,8 +36,11 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
           producto_id: i.producto_id,
           cantidad: i.cantidad,
           personalizacion: i.personalizacion,
+          precio: i.precio,
         }))
       );
+
+      setAdvertencias(result.advertencias ?? []);
 
       if (result.valido) {
         addToast('success', '✓ Carrito válido. Podés continuar con tu pedido.');
@@ -190,6 +194,18 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
             <span className="text-primary-500">${total()}</span>
           </div>
         </div>
+
+        {/* Advertencias de precio */}
+        {advertencias.length > 0 && (
+          <div className="space-y-2">
+            {advertencias.map((adv, i) => (
+              <div key={i} className="flex items-start gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-md px-3 py-2 text-sm">
+                <span className="flex-shrink-0">⚠️</span>
+                <span>{adv}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Botones de acción */}
         <div className="space-y-3">

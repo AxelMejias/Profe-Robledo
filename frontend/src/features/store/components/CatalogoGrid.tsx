@@ -10,6 +10,7 @@ interface CatalogoGridProps {
     busqueda?: string;
     precio_min?: number;
     precio_max?: number;
+    excluir_alergenos?: number[];
   };
   onPageChange?: (page: number) => void;
 }
@@ -22,6 +23,7 @@ export function CatalogoGrid({ filters = {}, onPageChange }: CatalogoGridProps) 
     busqueda: filters.busqueda,
     precio_min: filters.precio_min,
     precio_max: filters.precio_max,
+    excluir_alergenos: filters.excluir_alergenos,
     disponible: true,
   });
 

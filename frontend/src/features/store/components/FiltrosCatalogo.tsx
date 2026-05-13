@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useCategorias } from '@/entities/categoria/hooks';
+import { useIngredientes } from '@/entities/ingrediente/hooks';
 import { Input, Skeleton } from '@/shared/ui';
 
 interface FiltrosCatalogoProps {
   onCategoriaChange?: (categoria_id?: number) => void;
   onBusquedaChange?: (busqueda: string) => void;
   onPrecioChange?: (min: number, max: number) => void;
+  onAlergenos?: (ids: number[]) => void;
   selectedCategoria?: number;
 }
 
@@ -13,12 +15,17 @@ export function FiltrosCatalogo({
   onCategoriaChange,
   onBusquedaChange,
   onPrecioChange,
+  onAlergenos,
   selectedCategoria,
 }: FiltrosCatalogoProps) {
   const { data: categorias, isLoading } = useCategorias();
+  const { data: ingredientes } = useIngredientes();
+  const alergenos = ingredientes?.filter((i) => i.es_alergeno) ?? [];
+
   const [busqueda, setBusqueda] = useState('');
   const [precioMin, setPrecioMin] = useState(0);
   const [precioMax, setPrecioMax] = useState(5000);
+  const [alergenosExcluidos, setAlergenosExcluidos] = useState<number[]>([]);
 
   // Debounce búsqueda 500ms
   useEffect(() => {
@@ -29,13 +36,23 @@ export function FiltrosCatalogo({
     return () => clearTimeout(timer);
   }, [busqueda, onBusquedaChange]);
 
+  const toggleAlergeno = (id: number) => {
+    const next = alergenosExcluidos.includes(id)
+      ? alergenosExcluidos.filter((a) => a !== id)
+      : [...alergenosExcluidos, id];
+    setAlergenosExcluidos(next);
+    onAlergenos?.(next);
+  };
+
   const handleLimpiarFiltros = () => {
     setBusqueda('');
     setPrecioMin(0);
     setPrecioMax(5000);
+    setAlergenosExcluidos([]);
     onCategoriaChange?.(undefined);
     onBusquedaChange?.('');
     onPrecioChange?.(0, 5000);
+    onAlergenos?.([]);
   };
 
   return (
@@ -104,6 +121,28 @@ export function FiltrosCatalogo({
           </div>
         )}
       </div>
+
+      {/* Sin alérgenos */}
+      {alergenos.length > 0 && (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Sin alérgenos
+          </label>
+          <div className="space-y-1">
+            {alergenos.map((ing) => (
+              <label key={ing.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded px-1 py-1">
+                <input
+                  type="checkbox"
+                  checked={alergenosExcluidos.includes(ing.id)}
+                  onChange={() => toggleAlergeno(ing.id)}
+                  className="w-4 h-4 text-primary-500 border-gray-300 rounded"
+                />
+                <span className="text-sm">{ing.nombre}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Rango de precio */}
       <div className="space-y-3">

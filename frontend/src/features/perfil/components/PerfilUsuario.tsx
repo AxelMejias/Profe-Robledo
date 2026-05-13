@@ -6,6 +6,13 @@ import { Button, Badge, Input } from '@/shared/ui';
 import { PedidosRecientes } from './PedidosRecientes';
 import axios from '@/shared/api/axios';
 
+async function changePassword(passwordActual: string, passwordNuevo: string): Promise<void> {
+  await axios.put('/auth/me/password', {
+    password_actual: passwordActual,
+    password_nuevo: passwordNuevo,
+  });
+}
+
 const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'gray'> = {
   ADMIN: 'danger',
   STOCK: 'primary',
@@ -19,6 +26,43 @@ export function PerfilUsuario() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const passwordForm = useForm({
+    defaultValues: {
+      password_actual: '',
+      password_nuevo: '',
+      confirmar_password: '',
+    },
+    onSubmit: async ({ value }) => {
+      setPasswordError(null);
+
+      if (value.password_nuevo !== value.confirmar_password) {
+        setPasswordError('Las contraseñas nuevas no coinciden');
+        return;
+      }
+
+      setIsUpdatingPassword(true);
+      try {
+        await changePassword(value.password_actual, value.password_nuevo);
+        addToast('success', 'Contraseña actualizada correctamente');
+        setIsChangingPassword(false);
+        passwordForm.reset();
+      } catch (error: any) {
+        const code = error.response?.headers?.['x-error-code'];
+        if (code === 'INVALID_CURRENT_PASSWORD') {
+          setPasswordError('La contraseña actual es incorrecta');
+        } else {
+          const raw = error.response?.data?.detail;
+          setPasswordError(Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : (raw || 'Error al cambiar la contraseña'));
+        }
+      } finally {
+        setIsUpdatingPassword(false);
+      }
+    },
+  });
 
   const form = useForm({
     defaultValues: {
@@ -244,6 +288,126 @@ export function PerfilUsuario() {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-xl font-semibold mb-4">Mis pedidos recientes</h2>
         <PedidosRecientes />
+      </div>
+
+      {/* Cambiar contraseña */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Cambiar contraseña</h2>
+          {!isChangingPassword && (
+            <Button onClick={() => setIsChangingPassword(true)} variant="ghost">
+              Cambiar
+            </Button>
+          )}
+        </div>
+
+        {isChangingPassword && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              passwordForm.handleSubmit();
+            }}
+            className="space-y-4"
+          >
+            {passwordError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 rounded-md px-3 py-2 text-sm">
+                {passwordError}
+              </div>
+            )}
+
+            <passwordForm.Field
+              name="password_actual"
+              validators={{
+                onChange: ({ value }) => !value ? 'Requerido' : undefined,
+              }}
+              children={(field) => (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contraseña actual <span className="text-danger">*</span>
+                  </label>
+                  <Input
+                    type="password"
+                    value={field.state.value}
+                    onChange={(e) => { field.handleChange(e.target.value); setPasswordError(null); }}
+                    onBlur={field.handleBlur}
+                    autoComplete="current-password"
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="text-sm text-danger mt-1">{field.state.meta.errors[0]}</p>
+                  )}
+                </div>
+              )}
+            />
+
+            <passwordForm.Field
+              name="password_nuevo"
+              validators={{
+                onChange: ({ value }) =>
+                  !value ? 'Requerido' : value.length < 8 ? 'Mínimo 8 caracteres' : undefined,
+              }}
+              children={(field) => (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nueva contraseña <span className="text-danger">*</span>
+                  </label>
+                  <Input
+                    type="password"
+                    value={field.state.value}
+                    onChange={(e) => { field.handleChange(e.target.value); setPasswordError(null); }}
+                    onBlur={field.handleBlur}
+                    autoComplete="new-password"
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="text-sm text-danger mt-1">{field.state.meta.errors[0]}</p>
+                  )}
+                </div>
+              )}
+            />
+
+            <passwordForm.Field
+              name="confirmar_password"
+              validators={{
+                onChange: ({ value }) => !value ? 'Requerido' : undefined,
+              }}
+              children={(field) => (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirmar nueva contraseña <span className="text-danger">*</span>
+                  </label>
+                  <Input
+                    type="password"
+                    value={field.state.value}
+                    onChange={(e) => { field.handleChange(e.target.value); setPasswordError(null); }}
+                    onBlur={field.handleBlur}
+                    autoComplete="new-password"
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="text-sm text-danger mt-1">{field.state.meta.errors[0]}</p>
+                  )}
+                </div>
+              )}
+            />
+
+            <div className="flex gap-3 pt-4 border-t">
+              <Button type="submit" disabled={isUpdatingPassword}>
+                {isUpdatingPassword ? 'Guardando...' : 'Cambiar contraseña'}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsChangingPassword(false);
+                  setPasswordError(null);
+                  passwordForm.reset();
+                }}
+                variant="ghost"
+                disabled={isUpdatingPassword}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* Acciones rápidas */}

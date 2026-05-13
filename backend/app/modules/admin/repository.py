@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pedidos.model import Pedido
+from app.modules.pedidos.model import DetallePedido, Pedido
 from app.modules.productos.model import Producto
 
 
@@ -56,6 +56,24 @@ class AdminRepository:
         )
         rows = (await self.session.execute(stmt)).all()
         return [{"estado": row[0], "cantidad": row[1]} for row in rows]
+
+    async def get_top_productos(self, limit: int = 5) -> list[dict]:
+        stmt = (
+            select(
+                DetallePedido.producto_id,
+                Producto.nombre,
+                func.sum(DetallePedido.cantidad).label("total_vendido"),
+            )
+            .join(Pedido, Pedido.id == DetallePedido.pedido_id)
+            .join(Producto, Producto.id == DetallePedido.producto_id)
+            .where(Pedido.estado_codigo != "CANCELADO")
+            .where(Pedido.eliminado_en.is_(None))
+            .group_by(DetallePedido.producto_id, Producto.nombre)
+            .order_by(func.sum(DetallePedido.cantidad).desc())
+            .limit(limit)
+        )
+        rows = (await self.session.execute(stmt)).all()
+        return [{"producto_id": r[0], "nombre": r[1], "total_vendido": int(r[2])} for r in rows]
 
     async def ingresos_7_dias(self) -> list[dict]:
         hoy = date.today()

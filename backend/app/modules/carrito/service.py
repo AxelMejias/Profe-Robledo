@@ -16,6 +16,7 @@ async def validar(uow: UnitOfWork, data: ValidarCarritoRequest) -> ValidarCarrit
     """
     items_validados: list[ItemCarritoValidado] = []
     errores: list[str] = []
+    advertencias: list[str] = []
     subtotal = Decimal("0")
 
     for item in data.items:
@@ -36,6 +37,11 @@ async def validar(uow: UnitOfWork, data: ValidarCarritoRequest) -> ValidarCarrit
                 )
             )
             continue
+
+        if item.precio is not None and float(item.precio) != float(producto.precio_base):
+            advertencias.append(
+                f"El precio de '{producto.nombre}' cambió de ${item.precio} a ${producto.precio_base}"
+            )
 
         disponible = producto.disponible
         stock_ok = producto.stock_cantidad >= item.cantidad
@@ -72,4 +78,5 @@ async def validar(uow: UnitOfWork, data: ValidarCarritoRequest) -> ValidarCarrit
         items=items_validados,
         subtotal=subtotal,
         errores=errores,
+        advertencias=advertencias,
     )

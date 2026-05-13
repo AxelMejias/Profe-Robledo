@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProductos, useDeleteProducto } from '@/entities/producto/hooks';
+import { useProductos, useDeleteProducto, useToggleDisponibilidad } from '@/entities/producto/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Skeleton, EmptyState, Badge, Modal } from '@/shared/ui';
 import { FormProducto } from './FormProducto';
@@ -8,6 +8,7 @@ import type { Producto } from '@/shared/types';
 export function GestionProductos() {
   const { data, isLoading } = useProductos({ incluir_eliminados: false, size: 50 });
   const deleteMutation = useDeleteProducto();
+  const toggleDisponibilidadMutation = useToggleDisponibilidad();
   const addToast = useUIStore((s) => s.addToast);
 
   const [showFormModal, setShowFormModal] = useState(false);
@@ -117,12 +118,31 @@ export function GestionProductos() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge
-                      variant={producto.disponible ? 'secondary' : 'gray'}
-                      size="sm"
+                    <button
+                      onClick={async () => {
+                        try {
+                          await toggleDisponibilidadMutation.mutateAsync({
+                            id: producto.id,
+                            disponible: !producto.disponible,
+                          });
+                          addToast(
+                            'success',
+                            `Producto ${!producto.disponible ? 'habilitado' : 'deshabilitado'}`
+                          );
+                        } catch {
+                          addToast('error', 'Error al cambiar disponibilidad');
+                        }
+                      }}
+                      className="focus:outline-none"
+                      title="Click para cambiar disponibilidad"
                     >
-                      {producto.disponible ? 'Disponible' : 'No disponible'}
-                    </Badge>
+                      <Badge
+                        variant={producto.disponible ? 'secondary' : 'gray'}
+                        size="sm"
+                      >
+                        {producto.disponible ? 'Disponible' : 'No disponible'}
+                      </Badge>
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                     <button

@@ -60,3 +60,15 @@ class UpdateProfileRequest(BaseModel):
     nombre: Optional[str] = None
     apellido: Optional[str] = None
     telefono: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    password_actual: str
+    password_nuevo: str
+
+    @field_validator("password_nuevo")
+    @classmethod
+    def min_ocho_chars(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Mínimo 8 caracteres")
+        return v

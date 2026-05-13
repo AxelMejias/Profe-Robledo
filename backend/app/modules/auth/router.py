@@ -5,6 +5,7 @@ from app.core.limiter import limiter
 from app.core.uow import UnitOfWork
 from app.modules.auth import service as auth_service
 from app.modules.auth.schemas import (
+    ChangePasswordRequest,
     LoginRequest,
     LogoutRequest,
     RefreshRequest,
@@ -59,3 +60,13 @@ async def update_me(
 ) -> UserResponse:
     async with UnitOfWork() as uow:
         return await auth_service.update_profile(uow, current_user, body)
+
+
+@router.put("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    body: ChangePasswordRequest,
+    current_user: Usuario = Depends(get_current_user),
+) -> Response:
+    async with UnitOfWork() as uow:
+        await auth_service.change_password(uow, current_user, body)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

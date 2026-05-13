@@ -88,6 +88,7 @@ async def list_productos(
     precio_max: Optional[float] = None,
     disponible: Optional[bool] = None,
     search: Optional[str] = None,
+    excluir_alergenos: Optional[list[int]] = None,
 ) -> PaginatedProductos:
     items, total = await uow.productos.list_paginated(
         page=page,
@@ -97,6 +98,7 @@ async def list_productos(
         precio_max=precio_max,
         disponible=disponible,
         search=search,
+        excluir_alergenos=excluir_alergenos,
     )
     pages = ceil(total / size) if size else 1
     return PaginatedProductos(

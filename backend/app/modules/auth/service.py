@@ -13,6 +13,7 @@ from app.core.security import (
 from app.core.uow import UnitOfWork
 from app.modules.auth.model import UsuarioRol
 from app.modules.auth.schemas import (
+    ChangePasswordRequest,
     LoginRequest,
     RegisterRequest,
     TokenResponse,
@@ -87,6 +88,13 @@ async def login(uow: UnitOfWork, data: LoginRequest) -> TokenResponse:
     if usuario is None or not verify_password(data.password, usuario.password_hash):
         raise _invalid
 
+    if not usuario.activo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cuenta desactivada. Contactá al administrador.",
+            headers={"X-Error-Code": "USER_INACTIVE"},
+        )
+
     usuario_con_roles = await uow.usuarios.get_with_roles(usuario.id)
     roles = _roles_from(usuario_con_roles)
     return await _create_token_pair(uow, usuario, roles)
@@ -143,6 +151,31 @@ def me(current_user: Usuario) -> UserResponse:
         roles=_roles_from(current_user),
         creado_en=current_user.creado_en,
     )
+
+
+async def change_password(
+    uow: UnitOfWork, current_user: Usuario, data: ChangePasswordRequest
+) -> None:
+    if not verify_password(data.password_actual, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La contraseña actual es incorrecta",
+            headers={"X-Error-Code": "INVALID_CURRENT_PASSWORD"},
+        )
+
+    if data.password_actual == data.password_nuevo:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La nueva contraseña debe ser diferente a la actual",
+        )
+
+    user = await uow.usuarios.get_by_id(current_user.id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+
+    user.password_hash = hash_password(data.password_nuevo)
+    await uow.usuarios.update(user)
+    await uow.refresh_tokens.revoke_all_for_user(current_user.id)
 
 
 async def update_profile(

@@ -7,6 +7,7 @@ const menuItems = [
   { to: '/admin', label: 'Dashboard', icon: '📊' },
   { to: '/admin/productos', label: 'Productos', icon: '🍕' },
   { to: '/admin/categorias', label: 'Categorías', icon: '📁' },
+  { to: '/admin/ingredientes', label: 'Ingredientes', icon: '🧂' },
   { to: '/admin/usuarios', label: 'Usuarios', icon: '👥' },
   { to: '/admin/stock', label: 'Stock', icon: '📦' },
   { to: '/admin/pedidos', label: 'Pedidos', icon: '🛒' },

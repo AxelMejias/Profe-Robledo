@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { useCreateProducto, useUpdateProducto, useAssignCategorias } from '@/entities/producto/hooks';
+import {
+  useCreateProducto,
+  useUpdateProducto,
+  useAssignCategorias,
+  useAddIngrediente,
+  useRemoveIngrediente,
+} from '@/entities/producto/hooks';
 import { useCategorias } from '@/entities/categoria/hooks';
+import { useIngredientes } from '@/entities/ingrediente/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
-import { Modal, Button, Input } from '@/shared/ui';
+import { Modal, Button, Input, Badge } from '@/shared/ui';
 import type { Producto } from '@/shared/types';
 
 interface FormProductoProps {
@@ -15,13 +22,18 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
   const createMutation = useCreateProducto();
   const updateMutation = useUpdateProducto();
   const assignCatsMutation = useAssignCategorias();
+  const addIngredienteMutation = useAddIngrediente();
+  const removeIngredienteMutation = useRemoveIngrediente();
   const { data: categorias } = useCategorias();
+  const { data: todosIngredientes } = useIngredientes();
   const addToast = useUIStore((s) => s.addToast);
 
   const isEditing = !!producto;
   const [selectedCats, setSelectedCats] = useState<number[]>(
     producto?.categorias?.map((c) => c.id) ?? []
   );
+  const currentIngIds = new Set(producto?.ingredientes?.map((i) => i.id) ?? []);
+  const [selectedIngs, setSelectedIngs] = useState<Set<number>>(new Set(currentIngIds));
 
   const form = useForm({
     defaultValues: {
@@ -49,10 +61,25 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
           addToast('success', 'Producto creado correctamente');
         }
 
-        // Asignar categorías si se seleccionaron
-        if (selectedCats.length > 0) {
-          await assignCatsMutation.mutateAsync({ id: savedId, categoria_ids: selectedCats });
-        }
+        // Asignar categorías
+        await assignCatsMutation.mutateAsync({ id: savedId, categoria_ids: selectedCats });
+
+        // Sincronizar ingredientes: agregar los nuevos, quitar los removidos
+        const prevIds = isEditing
+          ? new Set(producto.ingredientes?.map((i) => i.id) ?? [])
+          : new Set<number>();
+
+        const toAdd = [...selectedIngs].filter((id) => !prevIds.has(id));
+        const toRemove = [...prevIds].filter((id) => !selectedIngs.has(id));
+
+        await Promise.all([
+          ...toAdd.map((ingrediente_id) =>
+            addIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+          ),
+          ...toRemove.map((ingrediente_id) =>
+            removeIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+          ),
+        ]);
 
         onClose();
       } catch (error: any) {
@@ -61,7 +88,11 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
     },
   });
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    addIngredienteMutation.isPending ||
+    removeIngredienteMutation.isPending;
 
   return (
     <Modal
@@ -228,6 +259,43 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                 <span className="text-sm">{cat.nombre}</span>
               </label>
             ))}
+          </div>
+        </div>
+
+        {/* Ingredientes */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ingredientes
+          </label>
+          <div className="max-h-48 overflow-y-auto space-y-2 border rounded-lg p-3">
+            {!todosIngredientes || todosIngredientes.length === 0 ? (
+              <p className="text-sm text-gray-500">No hay ingredientes disponibles</p>
+            ) : (
+              todosIngredientes.map((ing) => (
+                <label
+                  key={ing.id}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedIngs.has(ing.id)}
+                    onChange={(e) => {
+                      setSelectedIngs((prev) => {
+                        const next = new Set(prev);
+                        if (e.target.checked) next.add(ing.id);
+                        else next.delete(ing.id);
+                        return next;
+                      });
+                    }}
+                    className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <span className="text-sm flex-1">{ing.nombre}</span>
+                  {ing.es_alergeno && (
+                    <Badge variant="danger" size="sm">Alérgeno</Badge>
+                  )}
+                </label>
+              ))
+            )}
           </div>
         </div>
 

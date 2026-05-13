@@ -10,6 +10,7 @@ interface FetchProductosParams {
   precio_max?: number;
   disponible?: boolean;
   incluir_eliminados?: boolean;
+  excluir_alergenos?: number[];
 }
 
 export const productosApi = {
@@ -45,5 +46,22 @@ export const productosApi = {
   assignCategorias: async (id: number, categoria_ids: number[]): Promise<Producto> => {
     const { data } = await api.put(`/productos/${id}/categorias`, { categoria_ids });
     return data;
+  },
+
+  toggleDisponibilidad: async (id: number, disponible: boolean): Promise<Producto> => {
+    const { data } = await api.patch(`/productos/${id}/disponibilidad`, { disponible });
+    return data;
+  },
+
+  addIngrediente: async (
+    producto_id: number,
+    ingrediente_id: number,
+    es_removible = true
+  ): Promise<void> => {
+    await api.post(`/productos/${producto_id}/ingredientes`, { ingrediente_id, es_removible });
+  },
+
+  removeIngrediente: async (producto_id: number, ingrediente_id: number): Promise<void> => {
+    await api.delete(`/productos/${producto_id}/ingredientes/${ingrediente_id}`);
   },
 };

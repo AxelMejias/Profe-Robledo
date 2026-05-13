@@ -4,11 +4,13 @@ interface ValidarCarritoItem {
   producto_id: number;
   cantidad: number;
   personalizacion: number[];
+  precio?: number;
 }
 
 interface ValidarCarritoResponse {
   valido: boolean;
   errores: string[];
+  advertencias: string[];
 }
 
 export async function validarCarrito(

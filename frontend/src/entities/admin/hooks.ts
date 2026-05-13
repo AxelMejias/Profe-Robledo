@@ -24,3 +24,11 @@ export function useIngresos7Dias() {
     staleTime: 1 * 60 * 1000,
   });
 }
+
+export function useTopProductos() {
+  return useQuery({
+    queryKey: ['admin', 'top-productos'],
+    queryFn: adminApi.fetchTopProductos,
+    staleTime: 5 * 60 * 1000,
+  });
+}

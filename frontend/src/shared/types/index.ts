@@ -8,6 +8,7 @@ export interface Usuario {
   apellido: string;
   email: string;
   telefono?: string;
+  activo: boolean;
   roles: string[]; // ["ADMIN", "CLIENT", etc.]
   creado_en: string;
   actualizado_en: string;
@@ -216,6 +217,12 @@ export interface MetricaPorEstado {
 export interface MetricaIngresoDia {
   fecha: string;
   ingresos: number;
+}
+
+export interface TopProductoItem {
+  producto_id: number;
+  nombre: string;
+  total_vendido: number;
 }
 
 // Paginación

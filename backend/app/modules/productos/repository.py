@@ -38,6 +38,7 @@ class ProductoRepository(BaseRepository[Producto]):
         precio_max: Optional[float] = None,
         disponible: Optional[bool] = None,
         search: Optional[str] = None,
+        excluir_alergenos: Optional[list[int]] = None,
     ) -> tuple[list[Producto], int]:
         stmt = select(Producto).where(Producto.eliminado_en.is_(None))
 
@@ -57,6 +58,14 @@ class ProductoRepository(BaseRepository[Producto]):
             stmt = stmt.where(Producto.precio_base >= precio_min)
         if precio_max is not None:
             stmt = stmt.where(Producto.precio_base <= precio_max)
+        if excluir_alergenos:
+            from sqlalchemy import exists as sa_exists
+            sub = (
+                sa_exists()
+                .where(ProductoIngrediente.producto_id == Producto.id)
+                .where(ProductoIngrediente.ingrediente_id.in_(excluir_alergenos))
+            )
+            stmt = stmt.where(~sub)
 
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = (await self.session.execute(count_stmt)).scalar_one()

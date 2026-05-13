@@ -1,5 +1,5 @@
 import api from '@/shared/api/axios';
-import type { MetricasKPI, MetricaPorEstado, MetricaIngresoDia } from '@/shared/types';
+import type { MetricasKPI, MetricaPorEstado, MetricaIngresoDia, TopProductoItem } from '@/shared/types';
 
 export const adminApi = {
   fetchKPIs: async (): Promise<MetricasKPI> => {
@@ -14,6 +14,11 @@ export const adminApi = {
 
   fetchIngresos7Dias: async (): Promise<MetricaIngresoDia[]> => {
     const { data } = await api.get('/admin/metricas/ingresos-7-dias');
+    return data;
+  },
+
+  fetchTopProductos: async (): Promise<TopProductoItem[]> => {
+    const { data } = await api.get('/admin/metricas/productos-top');
     return data;
   },
 };

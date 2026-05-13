@@ -176,15 +176,16 @@ Paginación estándar: `GET /recursos?page=1&size=20` → `{ "items": [...], "to
 ## Implementation Order
 
 ```
-us-000-setup      ← DONE (archivado)
-us-001-auth       ← JWT · RBAC · refresh tokens (en progreso)
-us-002-categorias
-us-003-productos
-us-004-carrito
-us-005-pedidos
-us-006-pagos-mercadopago
-us-007-admin
-us-008-direcciones
+us-000-setup           ← DONE (archivado)
+us-001-auth            ← DONE (archivado) — JWT · RBAC · refresh tokens
+us-002-categorias      ← DONE (archivado)
+us-003-productos       ← DONE (archivado)
+us-004-carrito         ← DONE (archivado)
+us-005-pedidos         ← DONE (archivado)
+us-006-pagos           ← DONE (archivado) — MercadoPago checkout + webhook IPN
+us-007-admin           ← DONE (archivado) — dashboard KPIs + métricas
+us-008-direcciones     ← DONE (archivado)
+us-009-frontend        ← DONE (archivado) — frontend completo FSD (React + TanStack Query + Zustand)
 ```
 
 ## Development Workflow (OPSX)

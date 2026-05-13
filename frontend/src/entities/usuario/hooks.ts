@@ -38,3 +38,15 @@ export function useUpdateRoles() {
     },
   });
 }
+
+export function useToggleEstadoUsuario() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, activo }: { id: number; activo: boolean }) =>
+      usuariosApi.toggleEstado(id, activo),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+    },
+  });
+}

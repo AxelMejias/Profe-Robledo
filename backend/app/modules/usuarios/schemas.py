@@ -8,6 +8,10 @@ class AssignRolesRequest(BaseModel):
     roles: list[str]
 
 
+class ToggleEstadoRequest(BaseModel):
+    activo: bool
+
+
 class UserRolesResponse(BaseModel):
     id: int
     email: str
@@ -20,6 +24,7 @@ class UserRead(BaseModel):
     apellido: str
     email: str
     telefono: Optional[str] = None
+    activo: bool = True
     roles: list[str] = []
     creado_en: datetime
 

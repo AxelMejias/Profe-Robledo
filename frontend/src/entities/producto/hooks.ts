@@ -11,6 +11,7 @@ interface UseProductosFilters {
   precio_max?: number;
   disponible?: boolean;
   incluir_eliminados?: boolean;
+  excluir_alergenos?: number[];
 }
 
 export function useProductos(filters: UseProductosFilters = {}) {
@@ -87,6 +88,57 @@ export function useAssignCategorias() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['productos'] });
       queryClient.invalidateQueries({ queryKey: ['productos', id] });
+    },
+  });
+}
+
+export function useToggleDisponibilidad() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, disponible }: { id: number; disponible: boolean }) =>
+      productosApi.toggleDisponibilidad(id, disponible),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['productos'] });
+      queryClient.invalidateQueries({ queryKey: ['productos', id] });
+    },
+  });
+}
+
+export function useAddIngrediente() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      producto_id,
+      ingrediente_id,
+      es_removible,
+    }: {
+      producto_id: number;
+      ingrediente_id: number;
+      es_removible?: boolean;
+    }) => productosApi.addIngrediente(producto_id, ingrediente_id, es_removible),
+    onSuccess: (_, { producto_id }) => {
+      queryClient.invalidateQueries({ queryKey: ['productos', producto_id] });
+      queryClient.invalidateQueries({ queryKey: ['productos'] });
+    },
+  });
+}
+
+export function useRemoveIngrediente() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      producto_id,
+      ingrediente_id,
+    }: {
+      producto_id: number;
+      ingrediente_id: number;
+    }) => productosApi.removeIngrediente(producto_id, ingrediente_id),
+    onSuccess: (_, { producto_id }) => {
+      queryClient.invalidateQueries({ queryKey: ['productos', producto_id] });
+      queryClient.invalidateQueries({ queryKey: ['productos'] });
     },
   });
 }

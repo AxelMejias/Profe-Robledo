@@ -29,6 +29,7 @@ import { CategoriasAdminPage } from '@/pages/admin/CategoriasAdminPage';
 import { UsuariosAdminPage } from '@/pages/admin/UsuariosAdminPage';
 import { StockAdminPage } from '@/pages/admin/StockAdminPage';
 import { PedidosAdminPage } from '@/pages/admin/PedidosAdminPage';
+import { IngredientesAdminPage } from '@/pages/admin/IngredientesAdminPage';
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
       { path: 'productos', element: <ProductosAdminPage /> },
       { path: 'categorias', element: <CategoriasAdminPage /> },
       { path: 'usuarios', element: <UsuariosAdminPage /> },
+      { path: 'ingredientes', element: <IngredientesAdminPage /> },
       { path: 'stock', element: <StockAdminPage /> },
       { path: 'pedidos', element: <PedidosAdminPage /> },
     ],

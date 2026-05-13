@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from app.core.deps import require_role
 from app.core.uow import UnitOfWork
 from app.modules.admin import service as admin_service
-from app.modules.admin.schemas import MetricaIngresoDia, MetricaPorEstado, MetricasKPI
+from app.modules.admin.schemas import MetricaIngresoDia, MetricaPorEstado, MetricasKPI, TopProductoItem
 from app.modules.usuarios.model import Usuario
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -31,3 +31,11 @@ async def get_ingresos(
 ) -> list[MetricaIngresoDia]:
     async with UnitOfWork() as uow:
         return await admin_service.get_ingresos_7_dias(uow)
+
+
+@router.get("/metricas/productos-top", response_model=list[TopProductoItem])
+async def get_productos_top(
+    _: Usuario = Depends(require_role(["ADMIN"])),
+) -> list[TopProductoItem]:
+    async with UnitOfWork() as uow:
+        return await admin_service.get_top_productos(uow)

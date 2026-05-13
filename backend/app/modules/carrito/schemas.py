@@ -8,6 +8,7 @@ class ItemCarritoRequest(BaseModel):
     producto_id: int
     cantidad: int
     personalizacion: Optional[list[int]] = None
+    precio: Optional[float] = None
 
     @field_validator("cantidad")
     @classmethod
@@ -44,3 +45,4 @@ class ValidarCarritoResponse(BaseModel):
     items: list[ItemCarritoValidado]
     subtotal: Decimal
     errores: list[str]
+    advertencias: list[str] = []

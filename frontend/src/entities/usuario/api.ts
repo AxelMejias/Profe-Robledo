@@ -21,4 +21,9 @@ export const usuariosApi = {
     const { data } = await api.put(`/usuarios/${id}/roles`, { roles });
     return data;
   },
+
+  toggleEstado: async (id: number, activo: boolean): Promise<Usuario> => {
+    const { data } = await api.patch(`/usuarios/${id}/estado`, { activo });
+    return data;
+  },
 };
