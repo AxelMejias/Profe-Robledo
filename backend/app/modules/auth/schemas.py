@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 
@@ -42,6 +43,7 @@ class UserResponse(BaseModel):
     nombre: str
     apellido: str
     email: str
+    telefono: Optional[str] = None
     roles: list[str]
     creado_en: datetime
 
@@ -51,4 +53,11 @@ class RefreshRequest(BaseModel):
 
 
 class LogoutRequest(BaseModel):
+    refresh_token: str
+
+
+class UpdateProfileRequest(BaseModel):
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    telefono: Optional[str] = None
     refresh_token: str

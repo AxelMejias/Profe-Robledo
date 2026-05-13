@@ -10,6 +10,7 @@ from app.modules.auth.schemas import (
     RefreshRequest,
     RegisterRequest,
     TokenResponse,
+    UpdateProfileRequest,
     UserResponse,
 )
 from app.modules.usuarios.model import Usuario
@@ -49,3 +50,12 @@ async def logout(
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: Usuario = Depends(get_current_user)) -> UserResponse:
     return auth_service.me(current_user)
+
+
+@router.patch("/me", response_model=UserResponse)
+async def update_me(
+    body: UpdateProfileRequest,
+    current_user: Usuario = Depends(get_current_user),
+) -> UserResponse:
+    async with UnitOfWork() as uow:
+        return await auth_service.update_profile(uow, current_user, body)

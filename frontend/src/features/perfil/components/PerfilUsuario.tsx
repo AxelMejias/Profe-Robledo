@@ -30,7 +30,7 @@ export function PerfilUsuario() {
       setIsUpdating(true);
 
       try {
-        await axios.patch('/api/v1/usuarios/me', value);
+        await axios.patch('/auth/me', value);
         
         addToast('success', 'Perfil actualizado correctamente');
 

@@ -16,6 +16,7 @@ from app.modules.auth.schemas import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
+    UpdateProfileRequest,
     UserResponse,
 )
 from app.modules.refreshtokens.model import RefreshToken
@@ -138,6 +139,29 @@ def me(current_user: Usuario) -> UserResponse:
         nombre=current_user.nombre,
         apellido=current_user.apellido,
         email=current_user.email,
+        telefono=current_user.telefono,
         roles=_roles_from(current_user),
         creado_en=current_user.creado_en,
+    )
+
+
+async def update_profile(
+    uow: UnitOfWork, current_user: Usuario, data: UpdateProfileRequest
+) -> UserResponse:
+    update_data = data.model_dump(exclude_none=True)
+    if not update_data:
+        return me(current_user)
+
+    updated = await uow.usuarios.update(current_user.id, update_data)
+
+    # Recargar con roles
+    usuario_con_roles = await uow.usuarios.get_with_roles(updated.id)
+    return UserResponse(
+        id=usuario_con_roles.id,
+        nombre=usuario_con_roles.nombre,
+        apellido=usuario_con_roles.apellido,
+        email=usuario_con_roles.email,
+        telefono=usuario_con_roles.telefono,
+        roles=_roles_from(usuario_con_roles),
+        creado_en=usuario_con_roles.creado_en,
     )
