@@ -1,0 +1,11 @@
+export { Dashboard } from './components/Dashboard';
+export { GraficoIngresos7Dias } from './components/GraficoIngresos7Dias';
+export { GraficoPedidosPorEstado } from './components/GraficoPedidosPorEstado';
+export { GestionProductos } from './components/GestionProductos';
+export { FormProducto } from './components/FormProducto';
+export { GestionCategorias } from './components/GestionCategorias';
+export { FormCategoria } from './components/FormCategoria';
+export { GestionUsuarios } from './components/GestionUsuarios';
+export { EditarRolesModal } from './components/EditarRolesModal';
+export { GestionStock } from './components/GestionStock';
+export { GestionPedidos } from './components/GestionPedidos';
