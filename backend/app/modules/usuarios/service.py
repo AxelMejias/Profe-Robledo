@@ -4,9 +4,35 @@ from sqlalchemy import func, select
 from app.core.uow import UnitOfWork
 from app.modules.auth.model import UsuarioRol
 from app.modules.usuarios.model import Usuario
-from app.modules.usuarios.schemas import AssignRolesRequest, UserRolesResponse
+from app.modules.usuarios.schemas import AssignRolesRequest, PaginatedUsers, UserRead, UserRolesResponse
 
 _VALID_ROLES = {"ADMIN", "STOCK", "PEDIDOS", "CLIENT"}
+
+
+def _to_read(usuario: Usuario) -> UserRead:
+    return UserRead(
+        id=usuario.id,
+        nombre=usuario.nombre,
+        apellido=usuario.apellido,
+        email=usuario.email,
+        telefono=usuario.telefono,
+        roles=usuario.__dict__.get("_roles", []),
+        creado_en=usuario.creado_en,
+    )
+
+
+async def list_usuarios(
+    uow: UnitOfWork, page: int = 1, size: int = 50
+) -> PaginatedUsers:
+    usuarios, total = await uow.usuarios.list_all_with_roles(page, size)
+    pages = max(1, (total + size - 1) // size)
+    return PaginatedUsers(
+        items=[_to_read(u) for u in usuarios],
+        total=total,
+        page=page,
+        size=size,
+        pages=pages,
+    )
 
 
 async def set_roles(

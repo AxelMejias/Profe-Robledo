@@ -1,12 +1,24 @@
-from fastapi import APIRouter, Depends, status
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user, require_role
 from app.core.uow import UnitOfWork
 from app.modules.usuarios import service as usuario_service
 from app.modules.usuarios.model import Usuario
-from app.modules.usuarios.schemas import AssignRolesRequest, UserRolesResponse
+from app.modules.usuarios.schemas import AssignRolesRequest, PaginatedUsers, UserRolesResponse
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
+
+
+@router.get("", response_model=PaginatedUsers)
+async def list_usuarios(
+    page: int = Query(1, ge=1),
+    size: int = Query(50, ge=1, le=100),
+    current_user: Usuario = Depends(require_role(["ADMIN"])),
+) -> PaginatedUsers:
+    async with UnitOfWork() as uow:
+        return await usuario_service.list_usuarios(uow, page, size)
 
 
 @router.put("/{usuario_id}/roles", response_model=UserRolesResponse)
