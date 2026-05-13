@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreatePedido } from '@/entities/pedido/hooks';
 import { useDirecciones } from '@/entities/direccion/hooks';
@@ -26,14 +26,14 @@ export function CrearPedidoForm() {
   const [notas, setNotas] = useState('');
 
   // Preseleccionar dirección principal si existe
-  useState(() => {
+  useEffect(() => {
     if (direcciones && !direccionSeleccionada) {
       const principal = direcciones.find((d) => d.es_principal);
       if (principal) {
         setDireccionSeleccionada(principal.id);
       }
     }
-  });
+  }, [direcciones, direccionSeleccionada]);
 
   if (items.length === 0) {
     return (

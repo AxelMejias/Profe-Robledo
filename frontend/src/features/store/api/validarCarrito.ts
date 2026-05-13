@@ -15,7 +15,7 @@ export async function validarCarrito(
   items: ValidarCarritoItem[]
 ): Promise<ValidarCarritoResponse> {
   const response = await axios.post<ValidarCarritoResponse>(
-    '/api/v1/carrito/validar',
+    '/carrito/validar',
     { items }
   );
   return response.data;

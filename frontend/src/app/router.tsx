@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { RootLayout } from './RootLayout';
 
 // Páginas públicas
 import { HomePage } from '@/pages/HomePage';
@@ -31,97 +32,38 @@ import { PedidosAdminPage } from '@/pages/admin/PedidosAdminPage';
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <HomePage />,
-  },
-  {
-    path: '/catalogo',
-    element: <CatalogoPage />,
-  },
-  {
-    path: '/producto/:id',
-    element: <ProductoDetallePage />,
-  },
-  {
-    path: '/carrito',
-    element: <CarritoPage />,
-  },
-  {
-    path: '/pedidos',
-    element: <ProtectedRoute><PedidosPage /></ProtectedRoute>,
-  },
-  {
-    path: '/pedidos/:id',
-    element: <ProtectedRoute><PedidoDetallePage /></ProtectedRoute>,
-  },
-  {
-    path: '/checkout',
-    element: <ProtectedRoute><CheckoutPage /></ProtectedRoute>,
-  },
-  {
-    path: '/pago-mp/:id',
-    element: <ProtectedRoute><PagoMPPage /></ProtectedRoute>,
-  },
-  {
-    path: '/pago-exitoso/:id',
-    element: <ProtectedRoute><PagoExitosoPage /></ProtectedRoute>,
-  },
-  {
-    path: '/pago-rechazado/:id',
-    element: <ProtectedRoute><PagoRechazadoPage /></ProtectedRoute>,
-  },
-  {
-    path: '/perfil',
-    element: <ProtectedRoute><PerfilPage /></ProtectedRoute>,
-  },
-  {
-    path: '/perfil/direcciones',
-    element: <ProtectedRoute><DireccionesPage /></ProtectedRoute>,
-  },
-  {
-    path: '/admin',
-    element: <ProtectedRoute><AdminLayout /></ProtectedRoute>,
+    // Layout con Navigation + ToastContainer para páginas normales
+    element: <RootLayout />,
     children: [
-      {
-        index: true,
-        element: <DashboardPage />,
-      },
-      {
-        path: 'dashboard',
-        element: <DashboardPage />,
-      },
-      {
-        path: 'productos',
-        element: <ProductosAdminPage />,
-      },
-      {
-        path: 'categorias',
-        element: <CategoriasAdminPage />,
-      },
-      {
-        path: 'usuarios',
-        element: <UsuariosAdminPage />,
-      },
-      {
-        path: 'stock',
-        element: <StockAdminPage />,
-      },
-      {
-        path: 'pedidos',
-        element: <PedidosAdminPage />,
-      },
+      { path: '/', element: <HomePage /> },
+      { path: '/catalogo', element: <CatalogoPage /> },
+      { path: '/producto/:id', element: <ProductoDetallePage /> },
+      { path: '/carrito', element: <CarritoPage /> },
+      { path: '/pedidos', element: <ProtectedRoute><PedidosPage /></ProtectedRoute> },
+      { path: '/pedidos/:id', element: <ProtectedRoute><PedidoDetallePage /></ProtectedRoute> },
+      { path: '/checkout', element: <ProtectedRoute><CheckoutPage /></ProtectedRoute> },
+      { path: '/pago-mp/:id', element: <ProtectedRoute><PagoMPPage /></ProtectedRoute> },
+      { path: '/pago-exitoso/:id', element: <ProtectedRoute><PagoExitosoPage /></ProtectedRoute> },
+      { path: '/pago-rechazado/:id', element: <ProtectedRoute><PagoRechazadoPage /></ProtectedRoute> },
+      { path: '/perfil', element: <ProtectedRoute><PerfilPage /></ProtectedRoute> },
+      { path: '/perfil/direcciones', element: <ProtectedRoute><DireccionesPage /></ProtectedRoute> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
   {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />,
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
+    // Admin con su propio layout (sidebar)
+    path: '/admin',
+    element: <ProtectedRoute><AdminLayout /></ProtectedRoute>,
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'productos', element: <ProductosAdminPage /> },
+      { path: 'categorias', element: <CategoriasAdminPage /> },
+      { path: 'usuarios', element: <UsuariosAdminPage /> },
+      { path: 'stock', element: <StockAdminPage /> },
+      { path: 'pedidos', element: <PedidosAdminPage /> },
+    ],
   },
 ]);
