@@ -19,9 +19,8 @@ from app.modules.pedidos.schemas import (
 from app.modules.usuarios.model import Usuario
 
 # FSM: transitions allowed via PATCH /estado (ADMIN/PEDIDOS only)
-# PENDIENTE→CONFIRMADO is NOT here — only via MercadoPago webhook
 _FSM = {
-    "PENDIENTE": {"CANCELADO"},
+    "PENDIENTE": {"CONFIRMADO", "CANCELADO"},
     "CONFIRMADO": {"EN_PREP", "CANCELADO"},
     "EN_PREP": {"EN_CAMINO", "CANCELADO"},
     "EN_CAMINO": {"ENTREGADO"},
@@ -215,6 +214,19 @@ async def avanzar_estado(
             producto = await uow.pedidos.get_producto_for_update(detalle.producto_id)
             if producto is not None:
                 producto.stock_cantidad += detalle.cantidad
+                uow.pedidos.session.add(producto)
+
+    # Descontar stock al confirmar desde PENDIENTE
+    if estado_actual == "PENDIENTE" and nuevo_estado == "CONFIRMADO":
+        for detalle in await uow.pedidos.get_detalles(pedido_id):
+            producto = await uow.pedidos.get_producto_for_update(detalle.producto_id)
+            if producto is not None:
+                if producto.stock_cantidad < detalle.cantidad:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Stock insuficiente para '{producto.nombre}' (disponible: {producto.stock_cantidad})",
+                    )
+                producto.stock_cantidad -= detalle.cantidad
                 uow.pedidos.session.add(producto)
 
     pedido.estado_codigo = nuevo_estado

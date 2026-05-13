@@ -86,6 +86,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
 
   const handleAvanzar = async () => {
     const FSM: Record<string, string> = {
+      PENDIENTE: 'CONFIRMADO',
       CONFIRMADO: 'EN_PREP',
       EN_PREP: 'EN_CAMINO',
       EN_CAMINO: 'ENTREGADO',
