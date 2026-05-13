@@ -152,10 +152,23 @@ async def update_profile(
     if not update_data:
         return me(current_user)
 
-    updated = await uow.usuarios.update(current_user.id, update_data)
+    # Obtener una instancia attachada a la sesión del UoW
+    user = await uow.usuarios.get_by_id(current_user.id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Actualizar campos
+    if "nombre" in update_data:
+        user.nombre = update_data["nombre"]
+    if "apellido" in update_data:
+        user.apellido = update_data["apellido"]
+    if "telefono" in update_data:
+        user.telefono = update_data["telefono"]
+
+    await uow.usuarios.update(user)
 
     # Recargar con roles
-    usuario_con_roles = await uow.usuarios.get_with_roles(updated.id)
+    usuario_con_roles = await uow.usuarios.get_with_roles(user.id)
     return UserResponse(
         id=usuario_con_roles.id,
         nombre=usuario_con_roles.nombre,
