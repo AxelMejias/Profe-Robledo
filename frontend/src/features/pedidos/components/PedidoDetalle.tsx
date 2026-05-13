@@ -43,9 +43,8 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
       <div className="max-w-5xl mx-auto p-6">
         <EmptyState
           title="Pedido no encontrado"
-          message="El pedido que buscás no existe o no tenés acceso."
-          actionLabel="Volver a mis pedidos"
-          onAction={() => navigate('/pedidos')}
+          description="El pedido que buscás no existe o no tenés acceso."
+          action={{ label: 'Volver a mis pedidos', onClick: () => navigate('/pedidos') }}
         />
       </div>
     );
@@ -76,20 +75,12 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
         motivo: motivoCancelacion || undefined,
       });
 
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Pedido cancelado correctamente',
-      });
+      addToast('success', 'Pedido cancelado correctamente');
 
       setShowCancelarModal(false);
       setMotivoCancelacion('');
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al cancelar el pedido',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al cancelar el pedido');
     }
   };
 
@@ -100,20 +91,12 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
         observacion: observacionAvance || undefined,
       });
 
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Estado avanzado correctamente',
-      });
+      addToast('success', 'Estado avanzado correctamente');
 
       setShowAvanzarModal(false);
       setObservacionAvance('');
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al avanzar el estado',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al avanzar el estado');
     }
   };
 
@@ -267,8 +250,8 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
                     })}
                   </p>
                 </div>
-                <Badge variant={pago.estado_mp === 'approved' ? 'secondary' : 'danger'}>
-                  {pago.estado_mp}
+                <Badge variant={pago.mp_status === 'approved' ? 'secondary' : 'danger'}>
+                  {pago.mp_status}
                 </Badge>
               </div>
             ))}
@@ -279,7 +262,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
       {/* Modal de cancelación */}
       {showCancelarModal && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowCancelarModal(false)}
           title="¿Cancelar pedido?"
         >
@@ -304,7 +287,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
             )}
 
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowCancelarModal(false)} variant="outline">
+              <Button onClick={() => setShowCancelarModal(false)} variant="ghost">
                 Volver
               </Button>
               <Button
@@ -322,7 +305,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
       {/* Modal de avanzar estado */}
       {showAvanzarModal && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowAvanzarModal(false)}
           title="Avanzar estado del pedido"
         >
@@ -343,7 +326,7 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
             </div>
 
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowAvanzarModal(false)} variant="outline">
+              <Button onClick={() => setShowAvanzarModal(false)} variant="ghost">
                 Cancelar
               </Button>
               <Button

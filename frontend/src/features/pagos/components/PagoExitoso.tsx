@@ -76,7 +76,7 @@ export function PagoExitoso({ pedidoId }: PagoExitosoProps) {
           </Button>
           <Button
             onClick={() => navigate('/catalogo')}
-            variant="outline"
+            variant="ghost"
             size="lg"
           >
             Seguir comprando

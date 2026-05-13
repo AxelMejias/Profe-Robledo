@@ -22,18 +22,10 @@ export function GestionProductos() {
   const handleDelete = async (id: number) => {
     try {
       await deleteMutation.mutateAsync(id);
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Producto eliminado correctamente',
-      });
+      addToast('success', 'Producto eliminado correctamente');
       setShowDeleteModal(null);
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al eliminar el producto',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al eliminar el producto');
     }
   };
 
@@ -63,9 +55,8 @@ export function GestionProductos() {
       {!data?.items || data.items.length === 0 ? (
         <EmptyState
           title="No hay productos"
-          message="Agregá el primer producto para empezar."
-          actionLabel="Agregar producto"
-          onAction={() => setShowFormModal(true)}
+          description="Agregá el primer producto para empezar."
+          action={{ label: 'Agregar producto', onClick: () => setShowFormModal(true) }}
         />
       ) : (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -127,7 +118,7 @@ export function GestionProductos() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Badge
-                      variant={producto.disponible ? 'secondary' : 'default'}
+                      variant={producto.disponible ? 'secondary' : 'gray'}
                       size="sm"
                     >
                       {producto.disponible ? 'Disponible' : 'No disponible'}
@@ -165,7 +156,7 @@ export function GestionProductos() {
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal !== null && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowDeleteModal(null)}
           title="¿Eliminar producto?"
         >
@@ -174,7 +165,7 @@ export function GestionProductos() {
               ¿Estás seguro que querés eliminar este producto? Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowDeleteModal(null)} variant="outline">
+              <Button onClick={() => setShowDeleteModal(null)} variant="ghost">
                 Cancelar
               </Button>
               <Button

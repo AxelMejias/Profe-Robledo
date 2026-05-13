@@ -6,16 +6,15 @@ import { Button, Badge, Input } from '@/shared/ui';
 import { PedidosRecientes } from './PedidosRecientes';
 import axios from '@/shared/api/axios';
 
-const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'default'> = {
+const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'gray'> = {
   ADMIN: 'danger',
   STOCK: 'primary',
   PEDIDOS: 'secondary',
-  CLIENT: 'default',
+  CLIENT: 'gray',
 };
 
 export function PerfilUsuario() {
-  const user = useAuthStore((s) => s.user);
-  const setUser = useAuthStore((s) => s.setUser);
+  const user = useAuthStore((s) => s.user) as any;
   const addToast = useUIStore((s) => s.addToast);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -31,24 +30,14 @@ export function PerfilUsuario() {
       setIsUpdating(true);
 
       try {
-        const response = await axios.patch('/api/v1/usuarios/me', value);
+        await axios.patch('/api/v1/usuarios/me', value);
         
-        // Actualizar authStore con los nuevos datos
-        setUser(response.data);
-
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'success',
-          message: 'Perfil actualizado correctamente',
-        });
+        addToast('success', 'Perfil actualizado correctamente');
 
         setIsEditing(false);
+        window.location.reload();
       } catch (error: any) {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'error',
-          message: error.response?.data?.detail || 'Error al actualizar el perfil',
-        });
+        addToast('error', error.response?.data?.detail || 'Error al actualizar el perfil');
       } finally {
         setIsUpdating(false);
       }
@@ -65,7 +54,7 @@ export function PerfilUsuario() {
     );
   }
 
-  const fechaRegistro = new Date(user.creado_en).toLocaleDateString('es-AR', {
+  const fechaRegistro = new Date((user as any).creado_en).toLocaleDateString('es-AR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -85,7 +74,7 @@ export function PerfilUsuario() {
             </p>
           </div>
           {!isEditing && (
-            <Button onClick={() => setIsEditing(true)} variant="outline">
+            <Button onClick={() => setIsEditing(true)} variant="ghost">
               Editar perfil
             </Button>
           )}
@@ -203,7 +192,7 @@ export function PerfilUsuario() {
                   setIsEditing(false);
                   form.reset();
                 }}
-                variant="outline"
+                variant="ghost"
                 disabled={isUpdating}
               >
                 Cancelar
@@ -234,10 +223,10 @@ export function PerfilUsuario() {
             <div>
               <p className="text-sm text-gray-600 mb-2">Roles</p>
               <div className="flex flex-wrap gap-2">
-                {user.roles.map((rol) => (
+                {user.roles.map((rol: string) => (
                   <Badge
                     key={rol}
-                    variant={ROLE_COLORS[rol] || 'default'}
+                    variant={ROLE_COLORS[rol] || 'gray'}
                   >
                     {rol}
                   </Badge>
@@ -261,7 +250,7 @@ export function PerfilUsuario() {
           {/* Mis direcciones */}
           <Button
             onClick={() => window.location.href = '/perfil/direcciones'}
-            variant="outline"
+            variant="ghost"
             size="lg"
           >
             📍 Gestionar direcciones
@@ -270,7 +259,7 @@ export function PerfilUsuario() {
           {/* Catálogo */}
           <Button
             onClick={() => window.location.href = '/catalogo'}
-            variant="outline"
+            variant="ghost"
             size="lg"
           >
             🛒 Ir al catálogo

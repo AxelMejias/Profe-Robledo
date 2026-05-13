@@ -39,24 +39,12 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
       );
 
       if (result.valido) {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'success',
-          message: '✓ Carrito válido. Podés continuar con tu pedido.',
-        });
+        addToast('success', '✓ Carrito válido. Podés continuar con tu pedido.');
       } else {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'error',
-          message: `Problemas con el carrito:\n${result.errores.join('\n')}`,
-        });
+        addToast('error', `Problemas con el carrito:\n${result.errores.join('\n')}`);
       }
     } catch (error) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: 'Error al validar el carrito. Intentá de nuevo.',
-      });
+      addToast('error', 'Error al validar el carrito. Intentá de nuevo.');
     } finally {
       setIsValidating(false);
     }
@@ -78,21 +66,13 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
   const handleRemove = (producto_id: number) => {
     removeItem(producto_id);
     setShowConfirmRemove(null);
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'info',
-      message: 'Producto removido del carrito',
-    });
+    addToast('info', 'Producto removido del carrito');
   };
 
   const handleClearCart = () => {
     clearCart();
     setShowConfirmClear(false);
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'info',
-      message: 'Carrito vaciado',
-    });
+    addToast('info', 'Carrito vaciado');
   };
 
   if (items.length === 0) {
@@ -100,9 +80,8 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
       <div className={`${isOpen ? 'block' : 'hidden'} bg-white rounded-lg shadow-sm p-6`}>
         <EmptyState
           title="El carrito está vacío"
-          message="Agregá productos del catálogo para empezar tu pedido."
-          actionLabel="Ver catálogo"
-          onAction={() => navigate('/catalogo')}
+          description="Agregá productos del catálogo para empezar tu pedido."
+          action={{ label: 'Ver catálogo', onClick: () => navigate('/catalogo') }}
         />
       </div>
     );
@@ -216,7 +195,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
         <div className="space-y-3">
           <Button
             onClick={handleValidar}
-            variant="outline"
+            variant="ghost"
             size="lg"
             className="w-full"
             disabled={isValidating}
@@ -237,7 +216,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
       {/* Modal de confirmación para vaciar carrito */}
       {showConfirmClear && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowConfirmClear(false)}
           title="¿Vaciar carrito?"
         >
@@ -246,7 +225,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
               ¿Estás seguro que querés vaciar el carrito? Se perderán todos los productos agregados.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowConfirmClear(false)} variant="outline">
+              <Button onClick={() => setShowConfirmClear(false)} variant="ghost">
                 Cancelar
               </Button>
               <Button onClick={handleClearCart} variant="danger">
@@ -260,7 +239,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
       {/* Modal de confirmación para remover item (cuando cantidad = 1) */}
       {showConfirmRemove !== null && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowConfirmRemove(null)}
           title="¿Remover producto?"
         >
@@ -269,7 +248,7 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
               ¿Querés remover este producto del carrito?
             </p>
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowConfirmRemove(null)} variant="outline">
+              <Button onClick={() => setShowConfirmRemove(null)} variant="ghost">
                 Cancelar
               </Button>
               <Button onClick={() => handleRemove(showConfirmRemove)} variant="danger">

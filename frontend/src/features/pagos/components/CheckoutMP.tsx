@@ -27,7 +27,7 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
 
   // Polling de estado del pedido después de crear el pago
   const { data: pedidoPolling } = usePedido(pedidoId, {
-    refetchInterval: pollingActive ? 5000 : false, // Poll cada 5s si está activo
+    refetchInterval: pollingActive ? 5000 : undefined, // Poll cada 5s si está activo
   });
 
   // Detectar cambio de estado PENDIENTE → CONFIRMADO (pago aprobado)
@@ -49,11 +49,7 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
     if (pollingActive) {
       const timeout = setTimeout(() => {
         setPollingActive(false);
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'info',
-          message: 'Pago en proceso. Te notificaremos por email cuando se confirme.',
-        });
+        addToast('info', 'Pago en proceso. Te notificaremos por email cuando se confirme.');
         navigate(`/pedidos/${pedidoId}`);
       }, 120000); // 2 minutos
 
@@ -63,11 +59,7 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
 
   const handleSubmit = async (formData: any) => {
     if (!formData.token) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: 'Error al tokenizar la tarjeta. Intentá de nuevo.',
-      });
+      addToast('error', 'Error al tokenizar la tarjeta. Intentá de nuevo.');
       return;
     }
 
@@ -79,31 +71,19 @@ export function CheckoutMP({ pedidoId }: CheckoutMPProps) {
         token: formData.token,
       });
 
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'info',
-        message: 'Procesando pago... Esperá un momento.',
-      });
+      addToast('info', 'Procesando pago... Esperá un momento.');
 
       // Activar polling para detectar confirmación
       setPollingActive(true);
     } catch (error: any) {
       setIsProcessing(false);
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al procesar el pago. Intentá de nuevo.',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al procesar el pago. Intentá de nuevo.');
     }
   };
 
   const handleError = (error: any) => {
     console.error('CardPayment error:', error);
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'error',
-      message: 'Error en el formulario de pago. Revisá los datos ingresados.',
-    });
+    addToast('error', 'Error en el formulario de pago. Revisá los datos ingresados.');
   };
 
   if (loadingPedido || !pedido) {

@@ -35,9 +35,8 @@ export function CatalogoGrid({ filters = {}, onPageChange }: CatalogoGridProps) 
     return (
       <EmptyState
         title="Error al cargar productos"
-        message="No pudimos cargar el catálogo. Intentá de nuevo más tarde."
-        actionLabel="Reintentar"
-        onAction={() => window.location.reload()}
+        description="No pudimos cargar el catálogo. Intentá de nuevo más tarde."
+        action={{ label: 'Reintentar', onClick: () => window.location.reload() }}
       />
     );
   }
@@ -46,9 +45,8 @@ export function CatalogoGrid({ filters = {}, onPageChange }: CatalogoGridProps) 
     return (
       <EmptyState
         title="No encontramos productos"
-        message="No hay productos que coincidan con tu búsqueda. Probá con otros filtros."
-        actionLabel="Limpiar filtros"
-        onAction={() => window.location.href = '/catalogo'}
+        description="No hay productos que coincidan con tu búsqueda. Probá con otros filtros."
+        action={{ label: 'Limpiar filtros', onClick: () => window.location.href = '/catalogo' }}
       />
     );
   }

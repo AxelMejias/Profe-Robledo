@@ -32,7 +32,7 @@ export function SeleccionarDireccion({
   return (
     <>
       <Modal
-        isOpen={isOpen}
+        open={isOpen}
         onClose={onClose}
         title="Seleccionar dirección de entrega"
       >
@@ -46,9 +46,8 @@ export function SeleccionarDireccion({
           ) : !direcciones || direcciones.length === 0 ? (
             <EmptyState
               title="No tenés direcciones guardadas"
-              message="Agregá una dirección para continuar con tu pedido."
-              actionLabel="Agregar dirección"
-              onAction={() => setShowFormModal(true)}
+              description="Agregá una dirección para continuar con tu pedido."
+              action={{ label: 'Agregar dirección', onClick: () => setShowFormModal(true) }}
             />
           ) : (
             <>
@@ -101,7 +100,7 @@ export function SeleccionarDireccion({
               <div className="pt-4 border-t">
                 <Button
                   onClick={() => setShowFormModal(true)}
-                  variant="outline"
+                  variant="ghost"
                   className="w-full"
                 >
                   + Agregar nueva dirección
@@ -112,7 +111,7 @@ export function SeleccionarDireccion({
 
           {/* Botón cerrar */}
           <div className="pt-4 border-t">
-            <Button onClick={onClose} variant="outline" className="w-full">
+            <Button onClick={onClose} variant="ghost" className="w-full">
               Cancelar
             </Button>
           </div>

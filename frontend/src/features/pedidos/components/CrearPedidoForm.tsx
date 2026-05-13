@@ -40,9 +40,8 @@ export function CrearPedidoForm() {
       <div className="max-w-3xl mx-auto p-6">
         <EmptyState
           title="El carrito está vacío"
-          message="Agregá productos al carrito antes de crear un pedido."
-          actionLabel="Ir al catálogo"
-          onAction={() => navigate('/catalogo')}
+          description="Agregá productos al carrito antes de crear un pedido."
+          action={{ label: 'Ir al catálogo', onClick: () => navigate('/catalogo') }}
         />
       </div>
     );
@@ -52,11 +51,7 @@ export function CrearPedidoForm() {
     e.preventDefault();
 
     if (!direccionSeleccionada) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: 'Seleccioná una dirección de entrega',
-      });
+      addToast('error', 'Seleccioná una dirección de entrega');
       return;
     }
 
@@ -72,11 +67,7 @@ export function CrearPedidoForm() {
         })),
       });
 
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: `Pedido #${pedido.id} creado correctamente`,
-      });
+      addToast('success', `Pedido #${pedido.id} creado correctamente`);
 
       clearCart();
 
@@ -87,11 +78,7 @@ export function CrearPedidoForm() {
         navigate(`/pedidos/${pedido.id}`);
       }
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al crear el pedido',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al crear el pedido');
     }
   };
 
@@ -122,9 +109,8 @@ export function CrearPedidoForm() {
           ) : !direcciones || direcciones.length === 0 ? (
             <EmptyState
               title="No tenés direcciones"
-              message="Agregá una dirección de entrega para continuar."
-              actionLabel="Agregar dirección"
-              onAction={() => navigate('/perfil/direcciones')}
+              description="Agregá una dirección de entrega para continuar."
+              action={{ label: 'Agregar dirección', onClick: () => navigate('/perfil/direcciones') }}
             />
           ) : (
             <div className="space-y-3">

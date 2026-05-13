@@ -33,7 +33,7 @@ export function GraficoIngresos7Dias() {
           <Legend />
           <Line
             type="monotone"
-            dataKey="total"
+            dataKey="ingresos"
             stroke="#3b82f6"
             strokeWidth={2}
             name="Ingresos"

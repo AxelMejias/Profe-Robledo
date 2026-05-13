@@ -39,7 +39,7 @@ export function Dashboard() {
           />
           <KPICard
             title="Productos Sin Stock"
-            value={kpis?.productos_sin_stock || 0}
+            value={kpis?.sin_stock || 0}
             icon="⚠️"
             color="bg-red-500"
           />

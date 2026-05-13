@@ -61,7 +61,7 @@ export function Navigation() {
                   <Link to="/perfil" className="hover:text-primary transition-colors">
                     👤 {user?.nombre}
                   </Link>
-                  <Button onClick={handleLogout} variant="outline" size="sm">
+                  <Button onClick={handleLogout} variant="ghost" size="sm">
                     Salir
                   </Button>
                 </div>
@@ -70,7 +70,7 @@ export function Navigation() {
 
             {!isAuthenticated && (
               <>
-                <Button onClick={() => navigate('/login')} variant="outline" size="sm">
+                <Button onClick={() => navigate('/login')} variant="ghost" size="sm">
                   Iniciar sesión
                 </Button>
                 <Button onClick={() => navigate('/register')} size="sm">

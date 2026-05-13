@@ -27,11 +27,7 @@ export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
 
   const handleSubmit = async () => {
     if (selectedRoles.length === 0) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: 'Seleccioná al menos un rol',
-      });
+      addToast('error', 'Seleccioná al menos un rol');
       return;
     }
 
@@ -41,25 +37,17 @@ export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
         roles: selectedRoles,
       });
 
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Roles actualizados correctamente',
-      });
+      addToast('success', 'Roles actualizados correctamente');
 
       onClose();
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al actualizar roles',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al actualizar roles');
     }
   };
 
   return (
     <Modal
-      isOpen
+      open
       onClose={onClose}
       title={`Editar roles de ${usuario.nombre} ${usuario.apellido}`}
     >
@@ -84,7 +72,7 @@ export function EditarRolesModal({ usuario, onClose }: EditarRolesModalProps) {
         </div>
 
         <div className="flex gap-3 justify-end pt-4 border-t">
-          <Button onClick={onClose} variant="outline" disabled={updateRolesMutation.isPending}>
+          <Button onClick={onClose} variant="ghost" disabled={updateRolesMutation.isPending}>
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={updateRolesMutation.isPending}>

@@ -21,11 +21,7 @@ export function GestionStock() {
 
     try {
       await updateStockMutation.mutateAsync({ id, cantidad: newStock });
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Stock actualizado correctamente',
-      });
+      addToast('success', 'Stock actualizado correctamente');
       
       // Limpiar el estado editado
       setEditingStock((prev) => {
@@ -34,11 +30,7 @@ export function GestionStock() {
         return next;
       });
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al actualizar el stock',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al actualizar el stock');
     }
   };
 

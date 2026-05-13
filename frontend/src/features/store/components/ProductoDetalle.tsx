@@ -4,7 +4,6 @@ import { useCartStore } from '@/shared/store/cartStore';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Badge, Skeleton, EmptyState } from '@/shared/ui';
 import { PersonalizacionModal } from './PersonalizacionModal';
-import type { Ingrediente } from '@/shared/types';
 
 interface ProductoDetalleProps {
   productoId: number;
@@ -31,17 +30,14 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
     return (
       <EmptyState
         title="Producto no encontrado"
-        message="El producto que buscás no existe o fue eliminado."
-        actionLabel="Volver al catálogo"
-        onAction={() => window.location.href = '/catalogo'}
+        description="El producto que buscás no existe o fue eliminado."
+        action={{ label: 'Volver al catálogo', onClick: () => window.location.href = '/catalogo' }}
       />
     );
   }
 
   const isDisponible = producto.disponible && producto.stock_cantidad > 0;
-  const ingredientesRemovibles = producto.ingredientes?.filter((i) => {
-    // Asumimos que todos los ingredientes son removibles por defecto
-    // En producción, esto vendría de la relación ProductoIngrediente.es_removible
+  const ingredientesRemovibles = producto.ingredientes?.filter(() => {
     return true;
   }) ?? [];
 
@@ -56,11 +52,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
       personalizacion: [],
     });
 
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'success',
-      message: `${producto.nombre} agregado al carrito`,
-    });
+    addToast('success', `${producto.nombre} agregado al carrito`);
   };
 
   const handleAgregarConPersonalizacion = (ingredientesExcluidos: number[]) => {
@@ -72,11 +64,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
       personalizacion: ingredientesExcluidos,
     });
 
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'success',
-      message: `${producto.nombre} agregado al carrito con personalización`,
-    });
+    addToast('success', `${producto.nombre} agregado al carrito con personalización`);
 
     setShowPersonalizacion(false);
   };
@@ -149,7 +137,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
                   {producto.ingredientes.map((ing) => (
                     <Badge
                       key={ing.id}
-                      variant={ing.es_alergeno ? 'danger' : 'default'}
+                      variant={ing.es_alergeno ? 'danger' : 'gray'}
                     >
                       {ing.nombre}
                       {ing.es_alergeno && ' ⚠ Alérgeno'}
@@ -173,7 +161,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
               {isDisponible && ingredientesRemovibles.length > 0 && (
                 <Button
                   onClick={() => setShowPersonalizacion(true)}
-                  variant="outline"
+                  variant="ghost"
                   size="lg"
                   className="w-full"
                 >

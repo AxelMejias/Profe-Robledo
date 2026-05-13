@@ -22,7 +22,7 @@ export function PedidosRecientes() {
     return (
       <EmptyState
         title="Error al cargar pedidos"
-        message="No pudimos cargar tus pedidos recientes."
+        description="No pudimos cargar tus pedidos recientes."
       />
     );
   }
@@ -31,9 +31,8 @@ export function PedidosRecientes() {
     return (
       <EmptyState
         title="No tenés pedidos todavía"
-        message="Empezá a comprar en nuestro catálogo."
-        actionLabel="Ver catálogo"
-        onAction={() => window.location.href = '/catalogo'}
+        description="Empezá a comprar en nuestro catálogo."
+        action={{ label: 'Ver catálogo', onClick: () => window.location.href = '/catalogo' }}
       />
     );
   }
@@ -63,7 +62,7 @@ export function PedidosRecientes() {
                         ? 'secondary'
                         : pedido.estado_codigo === 'CANCELADO'
                         ? 'danger'
-                        : 'default'
+                        : 'gray'
                     }
                     size="sm"
                   >

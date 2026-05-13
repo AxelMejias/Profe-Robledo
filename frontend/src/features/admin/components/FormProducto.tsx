@@ -32,26 +32,14 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
             id: producto.id,
             producto: value,
           });
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Producto actualizado correctamente',
-          });
+          addToast('success', 'Producto actualizado correctamente');
         } else {
           await createMutation.mutateAsync(value);
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Producto creado correctamente',
-          });
+          addToast('success', 'Producto creado correctamente');
         }
         onClose();
       } catch (error: any) {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'error',
-          message: error.response?.data?.detail || 'Error al guardar el producto',
-        });
+        addToast('error', error.response?.data?.detail || 'Error al guardar el producto');
       }
     },
   });
@@ -60,7 +48,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
 
   return (
     <Modal
-      isOpen
+      open
       onClose={onClose}
       title={isEditing ? 'Editar producto' : 'Nuevo producto'}
     >
@@ -198,7 +186,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
         />
 
         <div className="flex gap-3 justify-end pt-4 border-t">
-          <Button onClick={onClose} variant="outline" disabled={isPending}>
+          <Button onClick={onClose} variant="ghost" disabled={isPending}>
             Cancelar
           </Button>
           <Button type="submit" disabled={isPending}>

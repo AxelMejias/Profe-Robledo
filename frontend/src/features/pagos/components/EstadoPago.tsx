@@ -7,7 +7,7 @@ interface EstadoPagoProps {
 
 const ESTADOS_CONFIG = {
   pending: {
-    variant: 'default' as const,
+    variant: 'gray' as const,
     icon: '⏳',
     label: 'Pendiente',
     color: 'text-gray-700',

@@ -22,18 +22,10 @@ export function GestionCategorias() {
   const handleDelete = async (id: number) => {
     try {
       await deleteMutation.mutateAsync(id);
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Categoría eliminada correctamente',
-      });
+      addToast('success', 'Categoría eliminada correctamente');
       setShowDeleteModal(null);
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al eliminar la categoría',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al eliminar la categoría');
     }
   };
 
@@ -53,9 +45,8 @@ export function GestionCategorias() {
       {!categorias || categorias.length === 0 ? (
         <EmptyState
           title="No hay categorías"
-          message="Agregá la primera categoría para empezar."
-          actionLabel="Agregar categoría"
-          onAction={() => setShowFormModal(true)}
+          description="Agregá la primera categoría para empezar."
+          action={{ label: 'Agregar categoría', onClick: () => setShowFormModal(true) }}
         />
       ) : (
         <div className="bg-white rounded-lg shadow-sm divide-y">
@@ -98,7 +89,7 @@ export function GestionCategorias() {
 
       {showDeleteModal !== null && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowDeleteModal(null)}
           title="¿Eliminar categoría?"
         >
@@ -107,7 +98,7 @@ export function GestionCategorias() {
               ¿Estás seguro que querés eliminar esta categoría?
             </p>
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowDeleteModal(null)} variant="outline">
+              <Button onClick={() => setShowDeleteModal(null)} variant="ghost">
                 Cancelar
               </Button>
               <Button

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useUsuarios } from '@/entities/usuario/hooks';
-import { Skeleton, EmptyState, Badge, Button } from '@/shared/ui';
+import { Skeleton, EmptyState, Badge } from '@/shared/ui';
 import { EditarRolesModal } from './EditarRolesModal';
 import type { Usuario } from '@/shared/types';
 
-const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'default'> = {
+const ROLE_COLORS: Record<string, 'primary' | 'secondary' | 'danger' | 'gray'> = {
   ADMIN: 'danger',
   STOCK: 'primary',
   PEDIDOS: 'secondary',
-  CLIENT: 'default',
+  CLIENT: 'gray',
 };
 
 export function GestionUsuarios() {
@@ -19,8 +19,8 @@ export function GestionUsuarios() {
     return <Skeleton className="h-96" />;
   }
 
-  if (!usuarios || usuarios.length === 0) {
-    return <EmptyState title="No hay usuarios" message="No se encontraron usuarios en el sistema." />;
+  if (!usuarios || usuarios.items.length === 0) {
+    return <EmptyState title="No hay usuarios" description="No se encontraron usuarios en el sistema." />;
   }
 
   return (
@@ -46,7 +46,7 @@ export function GestionUsuarios() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {usuarios.map((usuario) => (
+            {usuarios.items.map((usuario) => (
               <tr key={usuario.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="font-medium">{usuario.nombre} {usuario.apellido}</div>
@@ -60,7 +60,7 @@ export function GestionUsuarios() {
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2">
                     {usuario.roles.map((rol) => (
-                      <Badge key={rol} variant={ROLE_COLORS[rol] || 'default'} size="sm">
+                      <Badge key={rol} variant={ROLE_COLORS[rol] || 'gray'} size="sm">
                         {rol}
                       </Badge>
                     ))}

@@ -31,7 +31,7 @@ export function PersonalizacionModal({
 
   return (
     <Modal
-      isOpen
+      open
       onClose={onCancel}
       title={`Personalizar ${producto.nombre}`}
     >
@@ -87,7 +87,7 @@ export function PersonalizacionModal({
 
         {/* Botones */}
         <div className="flex gap-3 justify-end">
-          <Button onClick={onCancel} variant="outline">
+          <Button onClick={onCancel} variant="ghost">
             Cancelar
           </Button>
           <Button onClick={handleConfirmar}>

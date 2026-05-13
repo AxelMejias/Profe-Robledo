@@ -24,7 +24,7 @@ export function HistorialPagos({ pedidoId }: HistorialPagosProps) {
     return (
       <EmptyState
         title="Error al cargar historial de pagos"
-        message="No pudimos cargar el historial. Intentá de nuevo más tarde."
+        description="No pudimos cargar el historial. Intentá de nuevo más tarde."
       />
     );
   }
@@ -33,7 +33,7 @@ export function HistorialPagos({ pedidoId }: HistorialPagosProps) {
     return (
       <EmptyState
         title="Sin pagos registrados"
-        message="Este pedido aún no tiene pagos procesados."
+        description="Este pedido aún no tiene pagos procesados."
       />
     );
   }

@@ -28,26 +28,14 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
             id: categoria.id,
             categoria: value,
           });
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Categoría actualizada correctamente',
-          });
+      addToast('success', 'Categoría actualizada correctamente');
         } else {
           await createMutation.mutateAsync(value);
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Categoría creada correctamente',
-          });
+          addToast('success', 'Categoría creada correctamente');
         }
         onClose();
       } catch (error: any) {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'error',
-          message: error.response?.data?.detail || 'Error al guardar la categoría',
-        });
+        addToast('error', error.response?.data?.detail || 'Error al guardar la categoría');
       }
     },
   });
@@ -56,7 +44,7 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
 
   return (
     <Modal
-      isOpen
+      open
       onClose={onClose}
       title={isEditing ? 'Editar categoría' : 'Nueva categoría'}
     >
@@ -113,7 +101,7 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
         />
 
         <div className="flex gap-3 justify-end pt-4 border-t">
-          <Button onClick={onClose} variant="outline" disabled={isPending}>
+          <Button onClick={onClose} variant="ghost" disabled={isPending}>
             Cancelar
           </Button>
           <Button type="submit" disabled={isPending}>

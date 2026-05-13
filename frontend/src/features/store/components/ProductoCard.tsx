@@ -27,11 +27,7 @@ export function ProductoCard({ producto }: ProductoCardProps) {
       personalizacion: [],
     });
 
-    addToast({
-      id: crypto.randomUUID(),
-      type: 'success',
-      message: `${producto.nombre} agregado al carrito`,
-    });
+    addToast('success', `${producto.nombre} agregado al carrito`);
   };
 
   return (
@@ -76,7 +72,7 @@ export function ProductoCard({ producto }: ProductoCardProps) {
             onClick={handleAgregar}
             disabled={!isDisponible}
             size="sm"
-            variant={isDisponible ? 'primary' : 'outline'}
+            variant={isDisponible ? 'primary' : 'ghost'}
           >
             {isDisponible ? 'Agregar' : 'No disponible'}
           </Button>

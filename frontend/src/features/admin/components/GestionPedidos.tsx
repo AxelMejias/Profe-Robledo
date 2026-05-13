@@ -91,7 +91,7 @@ export function GestionPedidos() {
                         ? 'secondary'
                         : pedido.estado_codigo === 'CANCELADO'
                         ? 'danger'
-                        : 'default'
+                        : 'gray'
                     }
                     size="sm"
                   >
@@ -121,7 +121,7 @@ export function GestionPedidos() {
           <Button
             onClick={() => setPage((p) => p - 1)}
             disabled={page === 1}
-            variant="outline"
+            variant="ghost"
           >
             Anterior
           </Button>
@@ -131,7 +131,7 @@ export function GestionPedidos() {
           <Button
             onClick={() => setPage((p) => p + 1)}
             disabled={page === data.pages}
-            variant="outline"
+            variant="ghost"
           >
             Siguiente
           </Button>

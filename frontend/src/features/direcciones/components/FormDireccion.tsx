@@ -32,26 +32,14 @@ export function FormDireccion({ direccion, onClose }: FormDireccionProps) {
             id: direccion.id,
             direccion: value,
           });
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Dirección actualizada correctamente',
-          });
+          addToast('success', 'Dirección actualizada correctamente');
         } else {
           await createMutation.mutateAsync(value);
-          addToast({
-            id: crypto.randomUUID(),
-            type: 'success',
-            message: 'Dirección agregada correctamente',
-          });
+          addToast('success', 'Dirección agregada correctamente');
         }
         onClose();
       } catch (error: any) {
-        addToast({
-          id: crypto.randomUUID(),
-          type: 'error',
-          message: error.response?.data?.detail || 'Error al guardar la dirección',
-        });
+        addToast('error', error.response?.data?.detail || 'Error al guardar la dirección');
       }
     },
   });
@@ -60,7 +48,7 @@ export function FormDireccion({ direccion, onClose }: FormDireccionProps) {
 
   return (
     <Modal
-      isOpen
+      open
       onClose={onClose}
       title={isEditing ? 'Editar dirección' : 'Agregar dirección'}
     >
@@ -225,7 +213,7 @@ export function FormDireccion({ direccion, onClose }: FormDireccionProps) {
 
         {/* Botones */}
         <div className="flex gap-3 justify-end pt-4 border-t">
-          <Button onClick={onClose} variant="outline" disabled={isPending}>
+          <Button onClick={onClose} variant="ghost" disabled={isPending}>
             Cancelar
           </Button>
           <Button type="submit" disabled={isPending}>

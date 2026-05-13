@@ -15,10 +15,10 @@ const ESTADOS_PEDIDO = [
   { codigo: 'CANCELADO', nombre: 'Cancelado' },
 ];
 
-function getEstadoBadgeVariant(estado: string): 'default' | 'primary' | 'secondary' | 'danger' {
+function getEstadoBadgeVariant(estado: string): 'gray' | 'primary' | 'secondary' | 'danger' {
   switch (estado) {
     case 'PENDIENTE':
-      return 'default';
+      return 'gray';
     case 'CONFIRMADO':
       return 'primary';
     case 'EN_PREP':
@@ -29,7 +29,7 @@ function getEstadoBadgeVariant(estado: string): 'default' | 'primary' | 'seconda
     case 'CANCELADO':
       return 'danger';
     default:
-      return 'default';
+      return 'gray';
   }
 }
 
@@ -62,9 +62,8 @@ export function PedidosList() {
       <div className="max-w-4xl mx-auto p-6">
         <EmptyState
           title="Error al cargar pedidos"
-          message="No pudimos cargar tus pedidos. Intentá de nuevo más tarde."
-          actionLabel="Reintentar"
-          onAction={() => window.location.reload()}
+          description="No pudimos cargar tus pedidos. Intentá de nuevo más tarde."
+          action={{ label: 'Reintentar', onClick: () => window.location.reload() }}
         />
       </div>
     );
@@ -75,9 +74,8 @@ export function PedidosList() {
       <div className="max-w-4xl mx-auto p-6">
         <EmptyState
           title="No tenés pedidos todavía"
-          message="Explorá nuestro catálogo y hacé tu primer pedido."
-          actionLabel="Ir al catálogo"
-          onAction={() => window.location.href = '/catalogo'}
+          description="Explorá nuestro catálogo y hacé tu primer pedido."
+          action={{ label: 'Ir al catálogo', onClick: () => window.location.href = '/catalogo' }}
         />
       </div>
     );
@@ -133,7 +131,7 @@ export function PedidosList() {
           <Button
             onClick={() => setPage((p) => p - 1)}
             disabled={page === 1}
-            variant="outline"
+            variant="ghost"
           >
             Anterior
           </Button>
@@ -145,7 +143,7 @@ export function PedidosList() {
           <Button
             onClick={() => setPage((p) => p + 1)}
             disabled={page === data.pages}
-            variant="outline"
+            variant="ghost"
           >
             Siguiente
           </Button>

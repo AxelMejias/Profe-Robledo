@@ -23,35 +23,19 @@ export function ListaDirecciones() {
   const handleDelete = async (id: number) => {
     try {
       await deleteMutation.mutateAsync(id);
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Dirección eliminada correctamente',
-      });
+      addToast('success', 'Dirección eliminada correctamente');
       setShowDeleteModal(null);
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al eliminar la dirección',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al eliminar la dirección');
     }
   };
 
   const handleMarcarPrincipal = async (id: number) => {
     try {
       await marcarPrincipalMutation.mutateAsync(id);
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'success',
-        message: 'Dirección principal actualizada',
-      });
+      addToast('success', 'Dirección principal actualizada');
     } catch (error: any) {
-      addToast({
-        id: crypto.randomUUID(),
-        type: 'error',
-        message: error.response?.data?.detail || 'Error al marcar como principal',
-      });
+      addToast('error', error.response?.data?.detail || 'Error al marcar como principal');
     }
   };
 
@@ -76,9 +60,8 @@ export function ListaDirecciones() {
       <div className="max-w-4xl mx-auto p-6">
         <EmptyState
           title="Error al cargar direcciones"
-          message="No pudimos cargar tus direcciones. Intentá de nuevo más tarde."
-          actionLabel="Reintentar"
-          onAction={() => window.location.reload()}
+          description="No pudimos cargar tus direcciones. Intentá de nuevo más tarde."
+          action={{ label: 'Reintentar', onClick: () => window.location.reload() }}
         />
       </div>
     );
@@ -98,9 +81,8 @@ export function ListaDirecciones() {
       {!direcciones || direcciones.length === 0 ? (
         <EmptyState
           title="No tenés direcciones guardadas"
-          message="Agregá una dirección de entrega para poder hacer pedidos."
-          actionLabel="Agregar primera dirección"
-          onAction={() => setShowFormModal(true)}
+          description="Agregá una dirección de entrega para poder hacer pedidos."
+          action={{ label: 'Agregar primera dirección', onClick: () => setShowFormModal(true) }}
         />
       ) : (
         <div className="space-y-4">
@@ -141,7 +123,7 @@ export function ListaDirecciones() {
                   {!dir.es_principal && (
                     <Button
                       onClick={() => handleMarcarPrincipal(dir.id)}
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       disabled={marcarPrincipalMutation.isPending}
                     >
@@ -150,7 +132,7 @@ export function ListaDirecciones() {
                   )}
                   <Button
                     onClick={() => handleEdit(dir)}
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                   >
                     Editar
@@ -181,7 +163,7 @@ export function ListaDirecciones() {
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal !== null && (
         <Modal
-          isOpen
+          open
           onClose={() => setShowDeleteModal(null)}
           title="¿Eliminar dirección?"
         >
@@ -190,7 +172,7 @@ export function ListaDirecciones() {
               ¿Estás seguro que querés eliminar esta dirección? Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button onClick={() => setShowDeleteModal(null)} variant="outline">
+              <Button onClick={() => setShowDeleteModal(null)} variant="ghost">
                 Cancelar
               </Button>
               <Button

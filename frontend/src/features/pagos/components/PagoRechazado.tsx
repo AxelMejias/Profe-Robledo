@@ -102,7 +102,7 @@ export function PagoRechazado({ pedidoId }: PagoRechazadoProps) {
           </Button>
           <Button
             onClick={() => navigate(`/pedidos/${pedidoId}`)}
-            variant="outline"
+            variant="ghost"
             size="lg"
           >
             Ver detalle del pedido

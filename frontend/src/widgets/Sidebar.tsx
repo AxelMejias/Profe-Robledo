@@ -20,7 +20,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Menú">
+    <Modal open={isOpen} onClose={onClose} title="Menú">
       <nav className="space-y-2">
         {menuItems.map((item) => {
           if (!item.public && !isAuthenticated) return null;
