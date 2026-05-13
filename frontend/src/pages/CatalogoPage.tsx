@@ -9,6 +9,8 @@ export function CatalogoPage() {
     searchParams.get('categoria') ? Number(searchParams.get('categoria')) : undefined
   );
   const [busqueda, setBusqueda] = useState('');
+  const [precioMin, setPrecioMin] = useState(0);
+  const [precioMax, setPrecioMax] = useState(5000);
 
   const handleCategoriaChange = (id?: number) => {
     setCategoriaId(id);
@@ -26,6 +28,12 @@ export function CatalogoPage() {
     setPage(1);
   };
 
+  const handlePrecioChange = (min: number, max: number) => {
+    setPrecioMin(min);
+    setPrecioMax(max);
+    setPage(1);
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Catálogo de Productos</h1>
@@ -36,6 +44,7 @@ export function CatalogoPage() {
             selectedCategoria={categoriaId}
             onCategoriaChange={handleCategoriaChange}
             onBusquedaChange={handleBusquedaChange}
+            onPrecioChange={handlePrecioChange}
           />
         </aside>
 
@@ -46,6 +55,8 @@ export function CatalogoPage() {
               size: 12,
               categoria_id: categoriaId,
               busqueda: busqueda || undefined,
+              precio_min: precioMin > 0 ? precioMin : undefined,
+              precio_max: precioMax < 5000 ? precioMax : undefined,
             }}
             onPageChange={setPage}
           />

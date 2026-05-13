@@ -23,8 +23,8 @@ export const pedidosApi = {
     return data;
   },
 
-  avanzarEstado: async (id: number, observacion?: string): Promise<Pedido> => {
-    const { data } = await api.patch(`/pedidos/${id}/estado`, { observacion });
+  avanzarEstado: async (id: number, nuevo_estado: string, motivo?: string): Promise<Pedido> => {
+    const { data } = await api.patch(`/pedidos/${id}/estado`, { nuevo_estado, motivo });
     return data;
   },
 

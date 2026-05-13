@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Query
 
 from app.core.deps import get_current_user, require_role
@@ -20,10 +22,11 @@ router = APIRouter(prefix="/pedidos", tags=["pedidos"])
 async def list_pedidos(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
+    estado_codigo: Optional[str] = None,
     current_user: Usuario = Depends(get_current_user),
 ) -> PedidoListResponse:
     async with UnitOfWork() as uow:
-        return await pedidos_service.get_list(uow, page, size, current_user)
+        return await pedidos_service.get_list(uow, page, size, current_user, estado_codigo)
 
 
 @router.post("", response_model=PedidoRead, status_code=201)

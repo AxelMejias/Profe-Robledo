@@ -6,6 +6,8 @@ interface FetchProductosParams {
   size?: number;
   categoria_id?: number;
   busqueda?: string;
+  precio_min?: number;
+  precio_max?: number;
   disponible?: boolean;
   incluir_eliminados?: boolean;
 }

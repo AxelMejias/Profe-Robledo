@@ -8,6 +8,8 @@ interface CatalogoGridProps {
     size?: number;
     categoria_id?: number;
     busqueda?: string;
+    precio_min?: number;
+    precio_max?: number;
   };
   onPageChange?: (page: number) => void;
 }
@@ -18,6 +20,8 @@ export function CatalogoGrid({ filters = {}, onPageChange }: CatalogoGridProps) 
     size: filters.size ?? 12,
     categoria_id: filters.categoria_id,
     busqueda: filters.busqueda,
+    precio_min: filters.precio_min,
+    precio_max: filters.precio_max,
     disponible: true,
   });
 

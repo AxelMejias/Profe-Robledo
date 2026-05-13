@@ -41,8 +41,8 @@ export function useAvanzarEstado() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, observacion }: { id: number; observacion?: string }) =>
-      pedidosApi.avanzarEstado(id, observacion),
+    mutationFn: ({ id, nuevo_estado, motivo }: { id: number; nuevo_estado: string; motivo?: string }) =>
+      pedidosApi.avanzarEstado(id, nuevo_estado, motivo),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['pedidos'] });
       queryClient.invalidateQueries({ queryKey: ['pedidos', id] });

@@ -48,9 +48,10 @@ async def get_list(
     page: int,
     size: int,
     current_user: Usuario,
+    estado_codigo: Optional[str] = None,
 ) -> PedidoListResponse:
     usuario_id_filter: Optional[int] = None if _es_admin_pedidos(current_user) else current_user.id
-    pedidos, total = await uow.pedidos.list_paginated(page, size, usuario_id_filter)
+    pedidos, total = await uow.pedidos.list_paginated(page, size, usuario_id_filter, estado_codigo)
     pages = math.ceil(total / size) if size else 1
     return PedidoListResponse(
         items=[_to_read(p) for p in pedidos],

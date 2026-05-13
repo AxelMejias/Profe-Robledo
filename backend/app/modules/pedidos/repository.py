@@ -18,10 +18,13 @@ class PedidoRepository(BaseRepository[Pedido]):
         page: int,
         size: int,
         usuario_id: Optional[int] = None,
+        estado_codigo: Optional[str] = None,
     ) -> tuple[list[Pedido], int]:
         stmt = select(Pedido).where(Pedido.eliminado_en.is_(None))
         if usuario_id is not None:
             stmt = stmt.where(Pedido.usuario_id == usuario_id)
+        if estado_codigo is not None:
+            stmt = stmt.where(Pedido.estado_codigo == estado_codigo)
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = (await self.session.execute(count_stmt)).scalar_one()
         stmt = stmt.order_by(Pedido.creado_en.desc()).offset((page - 1) * size).limit(size)

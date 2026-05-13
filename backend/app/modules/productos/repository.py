@@ -34,6 +34,8 @@ class ProductoRepository(BaseRepository[Producto]):
         page: int,
         size: int,
         categoria_id: Optional[int] = None,
+        precio_min: Optional[float] = None,
+        precio_max: Optional[float] = None,
         disponible: Optional[bool] = None,
         search: Optional[str] = None,
     ) -> tuple[list[Producto], int]:
@@ -51,6 +53,10 @@ class ProductoRepository(BaseRepository[Producto]):
                     )
                 )
             )
+        if precio_min is not None:
+            stmt = stmt.where(Producto.precio_base >= precio_min)
+        if precio_max is not None:
+            stmt = stmt.where(Producto.precio_base <= precio_max)
 
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = (await self.session.execute(count_stmt)).scalar_one()

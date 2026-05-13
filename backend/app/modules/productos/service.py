@@ -84,13 +84,17 @@ async def list_productos(
     page: int,
     size: int,
     categoria_id: Optional[int],
-    disponible: Optional[bool],
+    precio_min: Optional[float] = None,
+    precio_max: Optional[float] = None,
+    disponible: Optional[bool] = None,
     search: Optional[str],
 ) -> PaginatedProductos:
     items, total = await uow.productos.list_paginated(
         page=page,
         size=size,
         categoria_id=categoria_id,
+        precio_min=precio_min,
+        precio_max=precio_max,
         disponible=disponible,
         search=search,
     )

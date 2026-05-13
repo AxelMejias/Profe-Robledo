@@ -75,11 +75,13 @@ async def list_productos(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
     categoria_id: Optional[int] = None,
+    precio_min: Optional[float] = None,
+    precio_max: Optional[float] = None,
     disponible: Optional[bool] = None,
     search: Optional[str] = None,
 ) -> PaginatedProductos:
     async with UnitOfWork() as uow:
-        return await prod_service.list_productos(uow, page, size, categoria_id, disponible, search)
+        return await prod_service.list_productos(uow, page, size, categoria_id, precio_min, precio_max, disponible, search)
 
 
 @router.get("/{producto_id}", response_model=ProductoDetail)

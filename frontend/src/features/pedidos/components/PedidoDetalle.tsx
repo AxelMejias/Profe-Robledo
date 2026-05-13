@@ -85,10 +85,19 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
   };
 
   const handleAvanzar = async () => {
+    const FSM: Record<string, string> = {
+      CONFIRMADO: 'EN_PREP',
+      EN_PREP: 'EN_CAMINO',
+      EN_CAMINO: 'ENTREGADO',
+    };
+    const nuevoEstado = FSM[pedido.estado_codigo];
+    if (!nuevoEstado) return;
+
     try {
       await avanzarMutation.mutateAsync({
         id: pedido.id,
-        observacion: observacionAvance || undefined,
+        nuevo_estado: nuevoEstado,
+        motivo: observacionAvance || undefined,
       });
 
       addToast('success', 'Estado avanzado correctamente');
