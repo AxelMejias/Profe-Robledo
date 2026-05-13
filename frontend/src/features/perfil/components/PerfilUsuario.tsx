@@ -30,12 +30,13 @@ export function PerfilUsuario() {
       setIsUpdating(true);
 
       try {
-        await axios.patch('/auth/me', value);
-        
-        addToast('success', 'Perfil actualizado correctamente');
+        const { data: updatedUser } = await axios.patch('/auth/me', value);
 
+        // Actualizar el authStore con los nuevos datos para que el perfil se refleje sin recargar
+        useAuthStore.setState({ user: updatedUser });
+
+        addToast('success', 'Perfil actualizado correctamente');
         setIsEditing(false);
-        window.location.reload();
       } catch (error: any) {
         const raw = error.response?.data?.detail;
         const msg = Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : (raw || 'Error al actualizar el perfil');
