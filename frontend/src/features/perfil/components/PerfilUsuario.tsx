@@ -37,7 +37,9 @@ export function PerfilUsuario() {
         setIsEditing(false);
         window.location.reload();
       } catch (error: any) {
-        addToast('error', error.response?.data?.detail || 'Error al actualizar el perfil');
+        const raw = error.response?.data?.detail;
+        const msg = Array.isArray(raw) ? raw.map((e: any) => e.msg || String(e)).join(', ') : (raw || 'Error al actualizar el perfil');
+        addToast('error', msg);
       } finally {
         setIsUpdating(false);
       }

@@ -60,4 +60,3 @@ class UpdateProfileRequest(BaseModel):
     nombre: Optional[str] = None
     apellido: Optional[str] = None
     telefono: Optional[str] = None
-    refresh_token: str
