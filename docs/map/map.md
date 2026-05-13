@@ -59,76 +59,121 @@
 
 ## 🔐 AUTENTICACIÓN Y USUARIOS
 
-### 2. `us-001-auth` ✅ IMPLEMENTADO
+### 2. `us-001-auth` ✅ ARCHIVADO
 
 **Funcionalidad:** JWT (HS256, 30 min) + refresh token (UUID v4, 7 días, rotación + replay attack detection), RBAC con 4 roles (ADMIN/STOCK/PEDIDOS/CLIENT), endpoints register/login/refresh/logout/me.
 **Dependencias:** `us-000-setup`
 
-- [x] JWT access token + refresh token con rotación y replay attack detection
-- [x] Endpoints: POST /register, POST /login, POST /refresh, POST /logout, GET /me
-- [x] Dependencias `get_current_user` y `require_role` para otros módulos
-- [x] Rate limiting: 5 intentos/IP en 15 min en POST /login
-- [x] PUT /usuarios/{id}/roles con protección RN-RB04 (último ADMIN)
-- [x] core/deps.py, core/limiter.py, UoW registra repos
+- [x] `UsuarioRepository` — `get_by_email`, `get_with_roles` (eager load)
+- [x] `RefreshTokenRepository` — `get_by_hash`, `revoke`, `revoke_all_for_user`
+- [x] `app/core/deps.py` — `get_current_user`, `require_role` factory
+- [x] `app/core/limiter.py` — slowapi, rate limit 5/15min en POST /login
+- [x] Auth service — register, login, refresh (rotación + replay attack RN-AU05), logout, `_create_token_pair`
+- [x] Endpoints: POST /register (201), POST /login, POST /refresh, POST /logout (204), GET /me
+- [x] `PUT /usuarios/{id}/roles` con protección RN-RB04 (último ADMIN)
+- [x] UoW registra `self.usuarios` y `self.refresh_tokens`
 
 ---
 
 ## 📂 CATÁLOGO
 
-### 3. `us-002-categorias` ⏳ PENDIENTE
+### 3. `us-002-categorias` ✅ ARCHIVADO
 
-**Funcionalidad:** CRUD de categorías con árbol jerárquico (FK auto-referencial parent_id), CTE recursiva para GET /{id}/arbol, soft delete.
+**Funcionalidad:** CRUD de categorías con árbol jerárquico (FK auto-referencial parent_id), soft delete.
 **Dependencias:** `us-001-auth`
 
-### 4. `us-003-productos` ⏳ PENDIENTE
+- [x] `model.py` — `Categoria(id, nombre, descripcion, imagen_url, parent_id FK self, timestamps, eliminado_en)`
+- [x] `schemas.py` — `CategoriaCreate`, `CategoriaUpdate`, `CategoriaRead`
+- [x] `repository.py` — `BaseRepository[Categoria]` + `list_paginated` con filtro `parent_id`
+- [x] `service.py` — CRUD con validación de parent circular, soft delete
+- [x] `router.py` — 5 endpoints, `require_role(["ADMIN","STOCK"])` en escritura
 
-**Funcionalidad:** CRUD de productos + ingredientes + relaciones producto-categoría + producto-ingrediente, gestión de stock, campo disponible, paginación con filtros.
+### 4. `us-003-productos` ✅ ARCHIVADO
+
+**Funcionalidad:** CRUD de productos + ingredientes + relaciones producto-categoría + producto-ingrediente (M2M), gestión de stock, campo disponible, paginación con filtros.
 **Dependencias:** `us-002-categorias`
+
+- [x] `model.py` — `Producto`, `Ingrediente`, `ProductoCategoria`, `ProductoIngrediente`
+- [x] `schemas.py` — `ProductoCreate/Update/Read`, `IngredienteCreate/Read`
+- [x] `repository.py` — `ProductoRepository` con `list_paginated`, `get_with_ingredientes`
+- [x] `service.py` — CRUD productos + gestión ingredientes, snapshot pattern preparado
+- [x] `router.py` — endpoints productos + endpoints ingredientes bajo `/ingredientes`
 
 ---
 
 ## 🧺 CARRITO Y PEDIDOS
 
-### 5. `us-004-carrito` ⏳ PENDIENTE
+### 5. `us-004-carrito` ✅ ARCHIVADO
 
-**Funcionalidad:** Validación server-side del carrito (precios, stock, disponibilidad), sincronización con cartStore Zustand.
+**Funcionalidad:** Validación server-side del carrito (stock, disponibilidad).
 **Dependencias:** `us-003-productos`
 
-### 6. `us-005-pedidos` ⏳ PENDIENTE
+- [x] `schemas.py` — `ValidarCarritoRequest`, `ValidarCarritoResponse(valido, errores)`
+- [x] `service.py` — `validar_carrito`: verifica `disponible` + stock por ítem
+- [x] `router.py` — `POST /carrito/validar` (CLIENT)
 
-**Funcionalidad:** Creación de pedidos (UoW atómico), snapshots de nombre/precio, FSM de 6 estados (PENDIENTE→CONFIRMADO→EN_PREP→EN_CAMINO→ENTREGADO/CANCELADO), historial append-only, PATCH /{id}/estado con validación de transiciones.
+### 6. `us-005-pedidos` ✅ ARCHIVADO
+
+**Funcionalidad:** Creación de pedidos (UoW atómico), snapshots de nombre/precio, FSM de 6 estados, historial append-only, PATCH /{id}/estado con validación de transiciones.
 **Dependencias:** `us-004-carrito`, `us-001-auth`
+
+- [x] `schemas.py` — `ItemPedidoRequest`, `CrearPedidoRequest`, `AvanzarEstadoRequest`, `PedidoRead`, `PedidoDetail`, `PedidoListResponse`
+- [x] `repository.py` — `list_paginated`, `get_detalles`, `get_historial`, `get_producto_for_update` (SELECT FOR UPDATE), `add_detalle`, `add_historial`
+- [x] `service.py` — `crear_pedido` (validate stock FOR UPDATE + snapshot), `avanzar_estado` (FSM + stock restore en CONFIRMADO→CANCELADO), `cancelar_pedido` (CLIENT, solo PENDIENTE)
+- [x] `router.py` — 6 endpoints, `avanzar_estado` require_role ADMIN/PEDIDOS
+- [x] UoW registra `self.pedidos`
 
 ---
 
 ## 💳 PAGOS
 
-### 7. `us-006-pagos-mercadopago` ⏳ PENDIENTE
+### 7. `us-006-pagos-mercadopago` ✅ ARCHIVADO
 
-**Funcionalidad:** Checkout API MercadoPago (tarjeta, Rapipago, Pago Fácil), webhook IPN para confirmación automática, idempotency key, external_reference, integración con FSM de pedidos.
+**Funcionalidad:** Checkout API MercadoPago, webhook IPN con firma HMAC-SHA256, idempotency key, integración con FSM de pedidos.
 **Dependencias:** `us-005-pedidos`
+
+- [x] `model.py` — `Pago(id, pedido_id FK, monto, mp_payment_id, mp_status, external_reference, idempotency_key, timestamps)`
+- [x] `schemas.py` — `CrearPagoRequest`, `PagoRead`, `WebhookMP`
+- [x] `repository.py` — `get_by_pedido`, `get_by_external_reference`
+- [x] `service.py` — `crear_pago` (idempotency_key uuid, MP SDK), `_verificar_firma` (HMAC-SHA256), `procesar_webhook` (RN-FS02 PENDIENTE→CONFIRMADO, RN-FS03 stock decrement)
+- [x] `router.py` — `POST /crear` (201), `POST /webhook` (200 siempre), `GET /{pedido_id}`
+- [x] `config.py` — `MP_WEBHOOK_SECRET` agregado
+- [x] UoW registra `self.pagos`
 
 ---
 
 ## 🔧 ADMIN Y DIRECCIONES
 
-### 8. `us-007-admin` ⏳ PENDIENTE
+### 8. `us-007-admin` ✅ ARCHIVADO
 
-**Funcionalidad:** Dashboard con métricas (recharts), CRUD de entidades desde panel, gestión de stock y pedidos, asignación de roles por ADMIN.
+**Funcionalidad:** Dashboard con métricas KPI y gráficos (ingresos 7 días, pedidos por estado).
 **Dependencias:** `us-001-auth`, `us-005-pedidos`, `us-003-productos`
 
-### 9. `us-008-direcciones` ⏳ PENDIENTE
+- [x] `schemas.py` — `MetricasKPI`, `MetricaPorEstado`, `MetricaIngresoDia`
+- [x] `repository.py` — `AdminRepository` (sin BaseRepository): `total_pedidos`, `ingresos_hoy`, `pedidos_pendientes`, `productos_sin_stock`, `por_estado`, `ingresos_7_dias`
+- [x] `service.py` — `get_kpis`, `get_por_estado`, `get_ingresos_7_dias`
+- [x] `router.py` — 3 endpoints GET, todos `require_role(["ADMIN"])`
+- [x] UoW registra `self.admin`
 
-**Funcionalidad:** CRUD de direcciones de entrega por usuario, marcar dirección principal, snapshot de dirección en pedido.
+### 9. `us-008-direcciones` ✅ ARCHIVADO
+
+**Funcionalidad:** CRUD de direcciones de entrega por usuario, dirección principal, soft delete.
 **Dependencias:** `us-001-auth`
+
+- [x] `model.py` — `DireccionEntrega(id, usuario_id FK, alias, linea1, linea2, ciudad, codigo_postal, referencia, es_principal, timestamps, eliminado_en)`
+- [x] `schemas.py` — `DireccionCreate`, `DireccionUpdate`, `DireccionRead`
+- [x] `repository.py` — `list_del_usuario`, `get_del_usuario`, `count_del_usuario`, `desactivar_todas`
+- [x] `service.py` — `crear` (RN-DI01), `actualizar`, `eliminar` (soft), `marcar_principal` (RN-DI02)
+- [x] `router.py` — 6 endpoints, `DELETE` retorna 204
+- [x] UoW registra `self.direcciones`
 
 ---
 
 ## ✔ Estado del proyecto
 
 - Total changes: 9
-- Archivados: 1 (us-000-setup)
-- Implementados: 1 (us-001-auth)
-- Pendientes: 7
+- Archivados: 9 (us-000 → us-008)
+- Implementados: 0
+- Pendientes: 0
 - Arquitectura: Feature-First backend + Feature-Sliced Design frontend ✔
 - Patrones: BaseRepository[T] + UoW + soft delete + snapshot + FSM ✔
