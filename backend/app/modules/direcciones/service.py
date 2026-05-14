@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import HTTPException
 
@@ -50,7 +50,7 @@ async def actualizar(
 
     for campo, valor in data.model_dump(exclude_unset=True).items():
         setattr(direccion, campo, valor)
-    direccion.actualizado_en = datetime.now(timezone.utc)
+    direccion.actualizado_en = datetime.utcnow()
     return DireccionRead.model_validate(await uow.direcciones.update(direccion))
 
 
@@ -71,5 +71,5 @@ async def marcar_principal(
     # RN-DI02: desactivar todas, activar solo la seleccionada
     await uow.direcciones.desactivar_todas(current_user.id)
     direccion.es_principal = True
-    direccion.actualizado_en = datetime.now(timezone.utc)
+    direccion.actualizado_en = datetime.utcnow()
     return DireccionRead.model_validate(await uow.direcciones.update(direccion))

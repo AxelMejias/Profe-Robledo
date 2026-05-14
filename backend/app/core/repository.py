@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Generic, Type, TypeVar
 
 from sqlalchemy import func, select
@@ -49,7 +49,7 @@ class BaseRepository(Generic[T]):
         return entity
 
     async def soft_delete(self, entity: T) -> None:
-        entity.eliminado_en = datetime.now(timezone.utc)  # type: ignore[attr-defined]
+        entity.eliminado_en = datetime.utcnow()  # type: ignore[attr-defined]
         self.session.add(entity)
         await self.session.flush()
 
