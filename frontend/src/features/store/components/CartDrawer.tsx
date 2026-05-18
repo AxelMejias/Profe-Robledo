@@ -42,7 +42,9 @@ export function CartDrawer({ isOpen = true, onClose }: CartDrawerProps) {
           producto_id: i.producto_id,
           cantidad: i.cantidad,
           personalizacion: i.personalizacion,
-          precio: i.precio,
+          // Solo mandamos precio si no hay extras; con extras el precio base
+          // siempre difiere del precio del carrito y generaría falsos positivos
+          precio: i.extras.length === 0 ? i.precio : undefined,
         }))
       );
 

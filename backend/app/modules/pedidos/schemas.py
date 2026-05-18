@@ -5,10 +5,18 @@ from typing import Optional
 from pydantic import BaseModel, field_validator
 
 
+class ExtraItemRequest(BaseModel):
+    ingrediente_id: int
+    nombre: str
+    precio: Decimal
+    cantidad: int
+
+
 class ItemPedidoRequest(BaseModel):
     producto_id: int
     cantidad: int
     personalizacion: Optional[list[int]] = None
+    extras: Optional[list[ExtraItemRequest]] = None
 
     @field_validator("cantidad")
     @classmethod
@@ -37,6 +45,15 @@ class AvanzarEstadoRequest(BaseModel):
     motivo: Optional[str] = None
 
 
+class ExtraItemRead(BaseModel):
+    ingrediente_id: int
+    nombre: str
+    precio: Decimal
+    cantidad: int
+
+    model_config = {"from_attributes": True}
+
+
 class DetallePedidoRead(BaseModel):
     producto_id: int
     nombre_snapshot: str
@@ -44,6 +61,7 @@ class DetallePedidoRead(BaseModel):
     cantidad: int
     subtotal: Decimal
     personalizacion: Optional[list[int]] = None
+    extras: Optional[list[ExtraItemRead]] = None
 
     model_config = {"from_attributes": True}
 

@@ -14,7 +14,13 @@ from app.modules.usuarios.model import Usuario
 router = APIRouter(prefix="/categorias", tags=["categorias"])
 
 
-@router.get("", response_model=list[CategoriaTree])
+@router.get("", response_model=list[CategoriaRead])
+async def list_flat() -> list[CategoriaRead]:
+    async with UnitOfWork() as uow:
+        return await cat_service.get_flat(uow)
+
+
+@router.get("/tree", response_model=list[CategoriaTree])
 async def list_tree() -> list[CategoriaTree]:
     async with UnitOfWork() as uow:
         return await cat_service.get_tree(uow)

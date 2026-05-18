@@ -37,7 +37,7 @@ export interface Categoria {
   nombre: string;
   descripcion?: string;
   imagen_url?: string;
-  parent_id?: number;
+  parent_id?: number | null;
   creado_en: string;
   actualizado_en: string;
   eliminado_en?: string;
@@ -52,6 +52,7 @@ export interface Ingrediente {
   precio: number;
   tipo_extra?: string | null;
   disponible_como_extra: boolean;
+  categoria_id?: number | null;
   creado_en: string;
   actualizado_en: string;
 }
@@ -102,6 +103,13 @@ export interface EstadoPedido {
   es_terminal: boolean;
 }
 
+export interface ExtraItem {
+  ingrediente_id: number;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+}
+
 export interface DetallePedido {
   id?: number;
   pedido_id?: number;
@@ -111,6 +119,7 @@ export interface DetallePedido {
   cantidad: number;
   subtotal: number;
   personalizacion?: number[];
+  extras?: ExtraItem[];
 }
 
 export interface HistorialEstadoPedido {
@@ -197,6 +206,7 @@ export interface ItemPedidoRequest {
   producto_id: number;
   cantidad: number;
   personalizacion?: number[];
+  extras?: { ingrediente_id: number; nombre: string; precio: number; cantidad: number }[];
 }
 
 export interface CrearPedidoRequest {

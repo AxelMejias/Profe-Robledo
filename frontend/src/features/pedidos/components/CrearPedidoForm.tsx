@@ -64,6 +64,7 @@ export function CrearPedidoForm() {
           producto_id: item.producto_id,
           cantidad: item.cantidad,
           personalizacion: item.personalizacion,
+          extras: item.extras?.length ? item.extras : undefined,
         })),
       });
 
@@ -205,20 +206,51 @@ export function CrearPedidoForm() {
         {/* Resumen */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold mb-4">Resumen del pedido</h2>
-          <div className="space-y-2 mb-4">
+          <div className="space-y-3 mb-4">
             {items.map((item) => (
-              <div key={item.producto_id} className="flex justify-between text-sm">
-                <span>
-                  {item.nombre} × {item.cantidad}
-                </span>
-                <span>${item.precio * item.cantidad}</span>
+              <div key={item.cartKey} className="text-sm">
+                <div className="flex justify-between">
+                  <span className="font-medium">
+                    {item.nombre} × {item.cantidad}
+                  </span>
+                  <span className="font-semibold">
+                    ${new Intl.NumberFormat('es-AR').format(item.precio * item.cantidad)}
+                  </span>
+                </div>
+                {item.extras && item.extras.length > 0 && (
+                  <ul className="mt-0.5 pl-2 space-y-0.5">
+                    {item.extras.map((e) => (
+                      <li key={e.ingrediente_id} className="text-gray-500">
+                        + {e.nombre}{e.cantidad > 1 ? ` ×${e.cantidad}` : ''}{' '}
+                        <span className="text-primary-500">
+                          +${new Intl.NumberFormat('es-AR').format(e.precio * e.cantidad)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {item.personalizacion && item.personalizacion.length > 0 && (
+                  <p className="text-gray-400 pl-2">
+                    Sin {item.personalizacion.length} ingrediente(s)
+                  </p>
+                )}
               </div>
             ))}
           </div>
-          <div className="pt-4 border-t">
-            <div className="flex justify-between text-xl font-bold">
+          <div className="pt-4 border-t space-y-1">
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Subtotal</span>
+              <span>${new Intl.NumberFormat('es-AR').format(total() - 50)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Envío</span>
+              <span>$50</span>
+            </div>
+            <div className="flex justify-between text-xl font-bold pt-2 border-t">
               <span>Total</span>
-              <span className="text-primary-500">${total()}</span>
+              <span className="text-primary-500">
+                ${new Intl.NumberFormat('es-AR').format(total())}
+              </span>
             </div>
           </div>
         </div>

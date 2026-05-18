@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import ARRAY, INTEGER
+from sqlalchemy.dialects.postgresql import ARRAY, INTEGER, JSONB
 from sqlmodel import Field, SQLModel
 
 
@@ -53,6 +53,9 @@ class DetallePedido(SQLModel, table=True):
     subtotal: Decimal = Field(decimal_places=2, max_digits=10)
     personalizacion: Optional[list[int]] = Field(
         default=None, sa_column=Column(ARRAY(INTEGER), nullable=True)
+    )
+    extras: Optional[list[dict]] = Field(
+        default=None, sa_column=Column(JSONB, nullable=True)
     )
 
 

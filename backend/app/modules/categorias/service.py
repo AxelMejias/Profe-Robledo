@@ -26,6 +26,11 @@ def _build_tree(cats: list[Categoria], parent_id: Optional[int]) -> list[Categor
     ]
 
 
+async def get_flat(uow: UnitOfWork) -> list[CategoriaRead]:
+    cats = await uow.categorias.get_all_flat()
+    return [CategoriaRead.model_validate(c) for c in cats]
+
+
 async def get_tree(uow: UnitOfWork) -> list[CategoriaTree]:
     cats = await uow.categorias.get_all_flat()
     return _build_tree(cats, parent_id=None)

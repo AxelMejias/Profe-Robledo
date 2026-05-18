@@ -41,6 +41,7 @@ async def create_ingrediente(uow: UnitOfWork, data: IngredienteCreate) -> Ingred
             precio=data.precio,
             tipo_extra=data.tipo_extra if data.tipo_extra else None,
             disponible_como_extra=data.disponible_como_extra,
+            categoria_id=data.categoria_id,
         )
     )
     return IngredienteRead.model_validate(ing)
@@ -74,10 +75,10 @@ async def update_ingrediente(
         ing.unidad_medida = data.unidad_medida
     if data.precio is not None:
         ing.precio = data.precio
-    if data.tipo_extra is not None:
-        ing.tipo_extra = data.tipo_extra if data.tipo_extra else None
+    ing.tipo_extra = data.tipo_extra if data.tipo_extra else None
     if data.disponible_como_extra is not None:
         ing.disponible_como_extra = data.disponible_como_extra
+    ing.categoria_id = data.categoria_id
     ing.actualizado_en = datetime.utcnow()
     updated = await uow.ingredientes.update(ing)
     return IngredienteRead.model_validate(updated)

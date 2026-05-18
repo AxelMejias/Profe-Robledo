@@ -186,16 +186,30 @@ export function PedidoDetalle({ pedidoId }: PedidoDetalleProps) {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Productos</h2>
         <div className="space-y-4">
-          {pedido.items?.map((detalle) => (
-            <div key={detalle.producto_id} className="flex justify-between items-start border-b pb-4 last:border-b-0">
+          {pedido.items?.map((detalle, idx) => (
+            <div key={`${detalle.producto_id}-${idx}`} className="flex justify-between items-start border-b pb-4 last:border-b-0">
               <div className="flex-1">
                 <p className="font-medium">{detalle.nombre_snapshot}</p>
                 {detalle.personalizacion && detalle.personalizacion.length > 0 && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-500">
                     Sin: {detalle.personalizacion.length} ingrediente(s)
                   </p>
                 )}
-                <p className="text-sm text-gray-600">
+                {detalle.extras && detalle.extras.length > 0 && (
+                  <ul className="mt-1 space-y-0.5">
+                    {detalle.extras.map((extra) => (
+                      <li key={extra.ingrediente_id} className="text-sm text-gray-600">
+                        + {extra.nombre}
+                        {extra.cantidad > 1 && ` ×${extra.cantidad}`}
+                        {' '}
+                        <span className="text-primary-500">
+                          +${new Intl.NumberFormat('es-AR').format(extra.precio * extra.cantidad)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-sm text-gray-600 mt-1">
                   ${new Intl.NumberFormat('es-AR').format(Number(detalle.precio_snapshot))} × {detalle.cantidad}
                 </p>
               </div>

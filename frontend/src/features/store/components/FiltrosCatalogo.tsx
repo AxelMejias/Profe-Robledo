@@ -98,7 +98,7 @@ export function FiltrosCatalogo({
             >
               Todas
             </button>
-            {categorias?.map((categoria) => (
+            {categorias?.filter((c) => c.parent_id != null).map((categoria) => (
               <button
                 key={categoria.id}
                 onClick={() => onCategoriaChange?.(categoria.id)}

@@ -151,8 +151,15 @@ async def crear_pedido(
             )
         validados.append((producto, item))
 
-    # 4. Calcular totales (RN-PE08)
-    subtotal = sum(p.precio_base * Decimal(str(i.cantidad)) for p, i in validados)
+    # 4. Calcular totales (RN-PE08) — precio base + extras por item
+    def _precio_item(producto, item) -> Decimal:
+        extras_cost = sum(
+            Decimal(str(e.precio)) * Decimal(str(e.cantidad))
+            for e in (item.extras or [])
+        )
+        return (producto.precio_base + extras_cost) * Decimal(str(item.cantidad))
+
+    subtotal = sum(_precio_item(p, i) for p, i in validados)
     costo_envio = Decimal("50.00")
     total = subtotal + costo_envio
 
@@ -172,14 +179,27 @@ async def crear_pedido(
 
     # 6. INSERT DetallePedido × N (RN-PE02, RN-PE07)
     for producto, item in validados:
+        extras_list = (
+            [
+                {
+                    "ingrediente_id": e.ingrediente_id,
+                    "nombre": e.nombre,
+                    "precio": float(e.precio),
+                    "cantidad": e.cantidad,
+                }
+                for e in item.extras
+            ]
+            if item.extras else None
+        )
         detalle = DetallePedido(
             pedido_id=pedido.id,
             producto_id=producto.id,
             nombre_snapshot=producto.nombre,
             precio_snapshot=producto.precio_base,
             cantidad=item.cantidad,
-            subtotal=producto.precio_base * Decimal(str(item.cantidad)),
+            subtotal=_precio_item(producto, item),
             personalizacion=item.personalizacion,
+            extras=extras_list,
         )
         await uow.pedidos.add_detalle(detalle)
 

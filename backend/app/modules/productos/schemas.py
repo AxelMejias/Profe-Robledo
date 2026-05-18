@@ -16,6 +16,7 @@ class IngredienteCreate(BaseModel):
     precio: Decimal = Decimal("0")
     tipo_extra: Optional[str] = None
     disponible_como_extra: bool = False
+    categoria_id: Optional[int] = None
 
     @field_validator("nombre")
     @classmethod
@@ -34,6 +35,7 @@ class IngredienteUpdate(BaseModel):
     precio: Optional[Decimal] = None
     tipo_extra: Optional[str] = None
     disponible_como_extra: Optional[bool] = None
+    categoria_id: Optional[int] = None
 
 
 class IngredienteRead(BaseModel):
@@ -45,6 +47,7 @@ class IngredienteRead(BaseModel):
     precio: Decimal
     tipo_extra: Optional[str]
     disponible_como_extra: bool
+    categoria_id: Optional[int] = None
     model_config = {"from_attributes": True}
 
 

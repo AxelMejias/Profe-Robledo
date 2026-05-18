@@ -25,7 +25,7 @@ async def get_por_estado(
         return await admin_service.get_por_estado(uow)
 
 
-@router.get("/metricas/ingresos", response_model=list[MetricaIngresoDia])
+@router.get("/metricas/ingresos-7-dias", response_model=list[MetricaIngresoDia])
 async def get_ingresos(
     _: Usuario = Depends(require_role(["ADMIN"])),
 ) -> list[MetricaIngresoDia]:

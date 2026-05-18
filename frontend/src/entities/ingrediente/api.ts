@@ -7,8 +7,9 @@ export interface IngredienteCreate {
   es_alergeno: boolean;
   unidad_medida?: string;
   precio?: number;
-  tipo_extra?: string;
+  tipo_extra?: string | null;
   disponible_como_extra?: boolean;
+  categoria_id?: number | null;
 }
 
 export interface IngredienteUpdate {
@@ -17,8 +18,9 @@ export interface IngredienteUpdate {
   es_alergeno?: boolean;
   unidad_medida?: string;
   precio?: number;
-  tipo_extra?: string;
+  tipo_extra?: string | null;
   disponible_como_extra?: boolean;
+  categoria_id?: number | null;
 }
 
 export const ingredientesApi = {

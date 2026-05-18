@@ -1,5 +1,7 @@
-﻿import { useForm } from '@tanstack/react-form';
+﻿import { useState } from 'react';
+import { useForm } from '@tanstack/react-form';
 import { useCreateCategoria, useUpdateCategoria } from '@/entities/categoria/hooks';
+import { useCategorias } from '@/entities/categoria/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Modal, Button, Input } from '@/shared/ui';
 import type { Categoria } from '@/shared/types';
@@ -13,8 +15,16 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
   const createMutation = useCreateCategoria();
   const updateMutation = useUpdateCategoria();
   const addToast = useUIStore((s) => s.addToast);
+  const { data: todasCategorias } = useCategorias();
 
   const isEditing = !!categoria;
+
+  // Solo categorías raíz (sin padre) pueden ser padre, y no puede ser la misma que se edita
+  const posiblesParent = (todasCategorias ?? []).filter(
+    (c) => c.parent_id == null && c.id !== categoria?.id
+  );
+
+  const [parentId, setParentId] = useState<number | null>(categoria?.parent_id ?? null);
 
   const form = useForm({
     defaultValues: {
@@ -26,11 +36,11 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
         if (isEditing) {
           await updateMutation.mutateAsync({
             id: categoria.id,
-            categoria: value,
+            categoria: { ...value, parent_id: parentId },
           });
-      addToast('success', 'Categoría actualizada correctamente');
+          addToast('success', 'Categoría actualizada correctamente');
         } else {
-          await createMutation.mutateAsync(value);
+          await createMutation.mutateAsync({ ...value, parent_id: parentId ?? undefined });
           addToast('success', 'Categoría creada correctamente');
         }
         onClose();
@@ -99,6 +109,26 @@ export function FormCategoria({ categoria, onClose }: FormCategoriaProps) {
             </div>
           )}
         />
+
+        {/* Categoría padre (opcional) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Categoría padre (opcional)
+          </label>
+          <select
+            value={parentId ?? ''}
+            onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : null)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+          >
+            <option value="">Sin padre (categoría raíz)</option>
+            {posiblesParent.map((c) => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-400 mt-1">
+            Si seleccionás una categoría padre, esta quedará como subcategoría dentro de ella.
+          </p>
+        </div>
 
         <div className="flex gap-3 justify-end pt-4 border-t">
           <Button onClick={onClose} variant="ghost" disabled={isPending}>

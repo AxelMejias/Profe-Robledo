@@ -7,6 +7,7 @@ import {
   useUpdateIngrediente,
   useDeleteIngrediente,
 } from '@/entities/ingrediente/hooks';
+import { useCategorias } from '@/entities/categoria/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Badge, Skeleton, EmptyState, Modal, Input } from '@/shared/ui';
 import { ingredientesApi } from '@/entities/ingrediente/api';
@@ -22,7 +23,28 @@ function FormIngrediente({
   const createMutation = useCreateIngrediente();
   const updateMutation = useUpdateIngrediente();
   const addToast = useUIStore((s) => s.addToast);
+  const { data: categorias } = useCategorias();
   const isEditing = !!ingrediente;
+
+  // Derivar categoría padre inicial a partir de categoria_id del ingrediente
+  const categoriaActual = categorias?.find((c) => c.id === ingrediente?.categoria_id);
+  // Si la cat actual tiene padre → su padre es el parentId; si es raíz → ella misma es "padre" en el selector
+  const [selectedParentId, setSelectedParentId] = useState<number | null>(
+    categoriaActual
+      ? (categoriaActual.parent_id ?? categoriaActual.id)
+      : null
+  );
+  const [selectedCatId, setSelectedCatId] = useState<number | null>(
+    ingrediente?.categoria_id ?? null
+  );
+
+  const rootCats = (categorias ?? []).filter((c) => c.parent_id == null);
+  const childCats = (categorias ?? []).filter((c) => c.parent_id === selectedParentId);
+
+  const handleParentChange = (id: number | null) => {
+    setSelectedParentId(id);
+    setSelectedCatId(null);
+  };
 
   const UNIDADES = [
     { value: 'UNIDAD', label: 'Unidad' },
@@ -33,11 +55,11 @@ function FormIngrediente({
   ];
 
   const TIPOS_EXTRA = [
-    { value: '',            label: 'General (todos los productos)' },
-    { value: 'hamburguesa', label: 'Hamburguesas' },
-    { value: 'postre',      label: 'Postres' },
-    { value: 'bebida',      label: 'Bebidas' },
-    { value: 'jugo',        label: 'Jugos' },
+    { value: '', label: 'General (todos los productos)' },
+    ...(categorias ?? []).map((c) => ({
+      value: c.nombre.toLowerCase(),
+      label: c.nombre,
+    })),
   ];
 
   const formatARS = (n: number) =>
@@ -65,21 +87,26 @@ function FormIngrediente({
     onSubmit: async ({ value }) => {
       try {
         if (isEditing) {
+          // Si hay hijo seleccionado usarlo; si no, usar el padre; si no hay padre, null (Global)
+          const finalCatId = selectedCatId ?? selectedParentId ?? null;
           await updateMutation.mutateAsync({ id: ingrediente.id, body: {
             ...value,
-            tipo_extra: value.tipo_extra || undefined,
+            tipo_extra: value.tipo_extra || null,
             disponible_como_extra: value.disponible_como_extra,
+            categoria_id: finalCatId,
           }});
           addToast('success', 'Ingrediente actualizado');
         } else {
+          const finalCatId = selectedCatId ?? selectedParentId ?? null;
           await createMutation.mutateAsync({
             nombre: value.nombre,
             descripcion: value.descripcion || undefined,
             es_alergeno: value.es_alergeno,
             unidad_medida: value.unidad_medida,
             precio: value.precio,
-            tipo_extra: value.tipo_extra || undefined,
+            tipo_extra: value.tipo_extra || null,
             disponible_como_extra: value.disponible_como_extra,
+            categoria_id: finalCatId,
           });
           addToast('success', 'Ingrediente creado');
         }
@@ -214,12 +241,54 @@ function FormIngrediente({
           )}
         />
 
+        {/* Categoría de producto — selección en cascada padre → subcategoría */}
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Categoría padre
+            </label>
+            <select
+              value={selectedParentId ?? ''}
+              onChange={(e) => handleParentChange(e.target.value ? Number(e.target.value) : null)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+            >
+              <option value="">Global (todos los productos)</option>
+              {rootCats.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedParentId !== null && childCats.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subcategoría específica
+              </label>
+              <select
+                value={selectedCatId ?? ''}
+                onChange={(e) => setSelectedCatId(e.target.value ? Number(e.target.value) : null)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+              >
+                <option value="">Todas las de {rootCats.find((c) => c.id === selectedParentId)?.nombre}</option>
+                {childCats.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <p className="text-xs text-gray-400">
+            Limita dónde aparece este ingrediente al editar productos en el panel admin.
+            Ingredientes "Global" aparecen en todos los productos.
+          </p>
+        </div>
+
         <form.Field
           name="tipo_extra"
           children={(field) => (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Aplica como extra en
+                ¿Disponible como extra en qué categoría?
               </label>
               <select
                 value={field.state.value}
@@ -231,7 +300,7 @@ function FormIngrediente({
                 ))}
               </select>
               <p className="text-xs text-gray-400 mt-1">
-                Controla en qué categoría de productos aparece como ingrediente extra disponible.
+                Controla en qué categoría de productos el cliente puede agregar este ingrediente como extra.
               </p>
             </div>
           )}
@@ -314,7 +383,7 @@ export function GestionIngredientes() {
         const rawPrecioXlsx = parseFloat(String(row['precio'] || row['Precio'] || '0').replace(/\./g, '').replace(',', '.'));
         const precio = isNaN(rawPrecioXlsx) ? 0 : rawPrecioXlsx;
         const rawTipo = String(row['tipo_extra'] || row['Tipo'] || row['tipo'] || '').trim().toLowerCase();
-        const tipo_extra = ['hamburguesa', 'postre', 'bebida', 'jugo'].includes(rawTipo) ? rawTipo : undefined;
+        const tipo_extra = rawTipo || undefined;
         const rawExtra = String(row['disponible_como_extra'] || row['Extra'] || row['extra'] || '').trim().toLowerCase();
         const disponible_como_extra = ['true', '1', 'si', 'sí', 'yes', 'verdadero'].includes(rawExtra);
 

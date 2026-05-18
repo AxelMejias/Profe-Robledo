@@ -16,6 +16,7 @@ class Ingrediente(SQLModel, table=True):
     precio: Decimal = Field(default=Decimal("0"), decimal_places=2, max_digits=10)
     tipo_extra: Optional[str] = Field(default=None, max_length=50)
     disponible_como_extra: bool = Field(default=False)
+    categoria_id: Optional[int] = Field(default=None, foreign_key="categorias.id")
     creado_en: datetime = Field(default_factory=datetime.utcnow)
     actualizado_en: datetime = Field(default_factory=datetime.utcnow)
     eliminado_en: Optional[datetime] = Field(default=None)

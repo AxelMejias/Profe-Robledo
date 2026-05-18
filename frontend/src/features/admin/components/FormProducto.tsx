@@ -373,6 +373,16 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                   <p className="text-sm text-gray-500">No hay ingredientes disponibles</p>
                 ) : (
                   todosIngredientes
+                    .filter((ing) => {
+                      if (ing.categoria_id == null) return true; // global
+                      if (selectedCats.includes(ing.categoria_id)) return true; // match exacto
+                      // match por padre: ingrediente asignado a cat padre de una cat del producto
+                      const catDelIng = categorias?.find((c) => c.id === ing.categoria_id);
+                      return catDelIng != null && selectedCats.some((id) => {
+                        const catProducto = categorias?.find((c) => c.id === id);
+                        return catProducto?.parent_id === catDelIng.id;
+                      });
+                    })
                     .filter((ing) => ing.nombre.toLowerCase().includes(ingSearch.toLowerCase()))
                     .map((ing) => {
                       const cantidad = ingCantidades.get(ing.id) ?? 0;
