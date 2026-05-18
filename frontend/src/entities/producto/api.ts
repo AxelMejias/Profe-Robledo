@@ -56,9 +56,18 @@ export const productosApi = {
   addIngrediente: async (
     producto_id: number,
     ingrediente_id: number,
-    es_removible = true
+    es_removible = true,
+    cantidad = 1
   ): Promise<void> => {
-    await api.post(`/productos/${producto_id}/ingredientes`, { ingrediente_id, es_removible });
+    await api.post(`/productos/${producto_id}/ingredientes`, { ingrediente_id, es_removible, cantidad });
+  },
+
+  updateIngredienteCantidad: async (
+    producto_id: number,
+    ingrediente_id: number,
+    cantidad: number
+  ): Promise<void> => {
+    await api.patch(`/productos/${producto_id}/ingredientes/${ingrediente_id}`, { cantidad });
   },
 
   removeIngrediente: async (producto_id: number, ingrediente_id: number): Promise<void> => {

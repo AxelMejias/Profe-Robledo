@@ -36,8 +36,8 @@ export function CatalogoPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Catálogo de Productos</h1>
+    <div className="max-w-7xl mx-auto px-6 pt-4 pb-2">
+      <h1 className="text-3xl font-bold mb-4">Catálogo de Productos</h1>
 
       <div className="grid lg:grid-cols-4 gap-6">
         <aside className="lg:col-span-1">

@@ -56,7 +56,7 @@ export function FiltrosCatalogo({
   };
 
   return (
-    <aside className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+    <aside className="bg-white rounded-lg shadow-md p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Filtros</h2>
         <button

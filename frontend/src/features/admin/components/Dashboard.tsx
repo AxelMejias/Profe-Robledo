@@ -1,4 +1,4 @@
-import { useKPIs } from '@/entities/admin/hooks';
+﻿import { useKPIs } from '@/entities/admin/hooks';
 import { Skeleton } from '@/shared/ui';
 import { GraficoIngresos7Dias } from './GraficoIngresos7Dias';
 import { GraficoPedidosPorEstado } from './GraficoPedidosPorEstado';
@@ -8,7 +8,7 @@ export function Dashboard() {
   const { data: kpis, isLoading } = useKPIs();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <h1 className="text-3xl font-bold">Panel de Administración</h1>
 
       {/* KPIs Cards */}
@@ -68,10 +68,10 @@ interface KPICardProps {
 
 function KPICard({ title, value, icon, color }: KPICardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white rounded-lg shadow-md p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{title}</p>
+          <p className="text-sm font-semibold text-gray-700 mb-1">{title}</p>
           <p className="text-3xl font-bold">{value}</p>
         </div>
         <div className={`${color} w-14 h-14 rounded-full flex items-center justify-center text-3xl`}>

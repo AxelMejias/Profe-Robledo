@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 from app.core.uow import UnitOfWork
 from app.modules.productos.model import Ingrediente, Producto
 from app.modules.productos.schemas import (
+    ActualizarIngredientePivotRequest,
     AsociarIngredienteRequest,
     AssignCategoriasRequest,
     CategoriaResumen,
@@ -36,6 +37,10 @@ async def create_ingrediente(uow: UnitOfWork, data: IngredienteCreate) -> Ingred
             nombre=data.nombre,
             descripcion=data.descripcion,
             es_alergeno=data.es_alergeno,
+            unidad_medida=data.unidad_medida,
+            precio=data.precio,
+            tipo_extra=data.tipo_extra if data.tipo_extra else None,
+            disponible_como_extra=data.disponible_como_extra,
         )
     )
     return IngredienteRead.model_validate(ing)
@@ -65,6 +70,14 @@ async def update_ingrediente(
         ing.descripcion = data.descripcion
     if data.es_alergeno is not None:
         ing.es_alergeno = data.es_alergeno
+    if data.unidad_medida is not None:
+        ing.unidad_medida = data.unidad_medida
+    if data.precio is not None:
+        ing.precio = data.precio
+    if data.tipo_extra is not None:
+        ing.tipo_extra = data.tipo_extra if data.tipo_extra else None
+    if data.disponible_como_extra is not None:
+        ing.disponible_como_extra = data.disponible_como_extra
     ing.actualizado_en = datetime.utcnow()
     updated = await uow.ingredientes.update(ing)
     return IngredienteRead.model_validate(updated)
@@ -219,12 +232,36 @@ async def add_ingrediente(
             detail="El ingrediente ya está asociado a este producto",
         )
 
-    await uow.productos.add_ingrediente(producto_id, data.ingrediente_id, data.es_removible)
+    await uow.productos.add_ingrediente(producto_id, data.ingrediente_id, data.es_removible, data.cantidad)
     return ProductoIngredienteRead(
         ingrediente_id=ing.id,
         nombre=ing.nombre,
         es_alergeno=ing.es_alergeno,
         es_removible=data.es_removible,
+        cantidad=data.cantidad,
+    )
+
+
+async def update_cantidad_ingrediente(
+    uow: UnitOfWork, producto_id: int, ingrediente_id: int, data: ActualizarIngredientePivotRequest
+) -> ProductoIngredienteRead:
+    if not await uow.productos.ingrediente_asociado(producto_id, ingrediente_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El ingrediente no está asociado a este producto",
+        )
+    ing = await uow.ingredientes.get_by_id(ingrediente_id)
+    if ing is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingrediente no encontrado")
+    await uow.productos.update_cantidad_ingrediente(producto_id, ingrediente_id, data.cantidad)
+    ingrs = await uow.productos.get_ingredientes(producto_id)
+    pivot = next((i for i in ingrs if i["ingrediente_id"] == ingrediente_id), None)
+    return ProductoIngredienteRead(
+        ingrediente_id=ing.id,
+        nombre=ing.nombre,
+        es_alergeno=ing.es_alergeno,
+        es_removible=pivot["es_removible"] if pivot else True,
+        cantidad=data.cantidad,
     )
 
 

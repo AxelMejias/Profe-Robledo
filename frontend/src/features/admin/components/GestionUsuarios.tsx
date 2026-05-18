@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useUsuarios, useToggleEstadoUsuario } from '@/entities/usuario/hooks';
 import { Skeleton, EmptyState, Badge } from '@/shared/ui';
 import { EditarRolesModal } from './EditarRolesModal';
@@ -28,7 +28,7 @@ export function GestionUsuarios() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

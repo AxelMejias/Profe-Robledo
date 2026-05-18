@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useProductos, useUpdateStock } from '@/entities/producto/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Skeleton, Button, Input } from '@/shared/ui';
@@ -49,7 +49,7 @@ export function GestionStock() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Gestión de Stock</h1>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

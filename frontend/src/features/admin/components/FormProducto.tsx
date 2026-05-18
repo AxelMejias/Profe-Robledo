@@ -1,10 +1,12 @@
-import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
 import {
+  useProducto,
   useCreateProducto,
   useUpdateProducto,
   useAssignCategorias,
   useAddIngrediente,
+  useUpdateIngredienteCantidad,
   useRemoveIngrediente,
 } from '@/entities/producto/hooks';
 import { useCategorias } from '@/entities/categoria/hooks';
@@ -23,17 +25,30 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
   const updateMutation = useUpdateProducto();
   const assignCatsMutation = useAssignCategorias();
   const addIngredienteMutation = useAddIngrediente();
+  const updateCantidadMutation = useUpdateIngredienteCantidad();
   const removeIngredienteMutation = useRemoveIngrediente();
   const { data: categorias } = useCategorias();
   const { data: todosIngredientes } = useIngredientes();
   const addToast = useUIStore((s) => s.addToast);
 
   const isEditing = !!producto;
-  const [selectedCats, setSelectedCats] = useState<number[]>(
-    producto?.categorias?.map((c) => c.id) ?? []
-  );
-  const currentIngIds = new Set(producto?.ingredientes?.map((i) => i.id) ?? []);
-  const [selectedIngs, setSelectedIngs] = useState<Set<number>>(new Set(currentIngIds));
+
+  // Fetchea el detalle completo (con categorías e ingredientes) cuando está editando
+  const { data: detalle } = useProducto(producto?.id ?? 0);
+
+  const [selectedCats, setSelectedCats] = useState<number[]>([]);
+  // Map ingId → cantidad (presencia en el mapa = seleccionado)
+  const [ingCantidades, setIngCantidades] = useState<Map<number, number>>(new Map());
+
+  // Inicializa selecciones una vez que llega el detalle
+  useEffect(() => {
+    if (detalle?.categorias) {
+      setSelectedCats(detalle.categorias.map((c) => c.id));
+    }
+    if (detalle?.ingredientes) {
+      setIngCantidades(new Map(detalle.ingredientes.map((i) => [i.ingrediente_id, i.cantidad])));
+    }
+  }, [detalle]);
   const [showIngSearch, setShowIngSearch] = useState(false);
   const [ingSearch, setIngSearch] = useState('');
   const [catsOpen, setCatsOpen] = useState(false);
@@ -78,29 +93,35 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
 
         // Asignar categorías solo si: es nuevo, o si el producto ya traía sus categorías cargadas
         // (evita borrar la asignación cuando la lista no incluye ese campo)
-        const debeActualizarCats = !isEditing || producto.categorias !== undefined;
+        const debeActualizarCats = !isEditing || detalle?.categorias !== undefined;
         if (debeActualizarCats) {
           await assignCatsMutation.mutateAsync({ id: savedId, categoria_ids: selectedCats });
         }
 
-        // Sincronizar ingredientes: agregar los nuevos, quitar los removidos
-        // Solo si el producto ya traía sus ingredientes cargados (misma razón)
-        const prevIds =
-          isEditing && producto.ingredientes !== undefined
-            ? new Set(producto.ingredientes.map((i) => i.id))
+        // Sincronizar ingredientes: agregar nuevos, quitar removidos, actualizar cantidades
+        const prevData =
+          isEditing && detalle?.ingredientes !== undefined
+            ? detalle.ingredientes
             : isEditing
-            ? null // ingredientes no cargados → no tocar
-            : new Set<number>();
+            ? null // detalle aún no cargado → no tocar
+            : [];
 
-        if (prevIds !== null) {
-          const toAdd = [...selectedIngs].filter((id) => !prevIds.has(id));
-          const toRemove = [...prevIds].filter((id) => !selectedIngs.has(id));
+        if (prevData !== null) {
+          const prevMap = new Map(prevData.map((i) => [i.ingrediente_id, i.cantidad]));
+          const toAdd = [...ingCantidades.entries()].filter(([id]) => !prevMap.has(id));
+          const toRemove = [...prevMap.keys()].filter((id) => !ingCantidades.has(id));
+          const toUpdate = [...ingCantidades.entries()].filter(
+            ([id, qty]) => prevMap.has(id) && prevMap.get(id) !== qty
+          );
           await Promise.all([
-            ...toAdd.map((ingrediente_id) =>
-              addIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+            ...toAdd.map(([ingrediente_id, cantidad]) =>
+              addIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id, cantidad })
             ),
             ...toRemove.map((ingrediente_id) =>
               removeIngredienteMutation.mutateAsync({ producto_id: savedId, ingrediente_id })
+            ),
+            ...toUpdate.map(([ingrediente_id, cantidad]) =>
+              updateCantidadMutation.mutateAsync({ producto_id: savedId, ingrediente_id, cantidad })
             ),
           ]);
         }
@@ -116,6 +137,7 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
     createMutation.isPending ||
     updateMutation.isPending ||
     addIngredienteMutation.isPending ||
+    updateCantidadMutation.isPending ||
     removeIngredienteMutation.isPending;
 
   return (
@@ -314,9 +336,9 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
           >
             <span className="text-sm font-medium text-gray-700">
               Ingredientes
-              {selectedIngs.size > 0 && (
+              {ingCantidades.size > 0 && (
                 <span className="ml-2 text-xs text-primary-500 font-semibold">
-                  ({selectedIngs.size} seleccionado{selectedIngs.size !== 1 ? 's' : ''})
+                  ({ingCantidades.size} seleccionado{ingCantidades.size !== 1 ? 's' : ''})
                 </span>
               )}
             </span>
@@ -346,36 +368,73 @@ export function FormProducto({ producto, onClose }: FormProductoProps) {
                   className="mb-2"
                 />
               )}
-              <div className="max-h-48 overflow-y-auto space-y-2">
+              <div className="max-h-56 overflow-y-auto space-y-1">
                 {!todosIngredientes || todosIngredientes.length === 0 ? (
                   <p className="text-sm text-gray-500">No hay ingredientes disponibles</p>
                 ) : (
                   todosIngredientes
                     .filter((ing) => ing.nombre.toLowerCase().includes(ingSearch.toLowerCase()))
-                    .map((ing) => (
-                      <label
-                        key={ing.id}
-                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedIngs.has(ing.id)}
-                          onChange={(e) => {
-                            setSelectedIngs((prev) => {
-                              const next = new Set(prev);
-                              if (e.target.checked) next.add(ing.id);
-                              else next.delete(ing.id);
-                              return next;
-                            });
-                          }}
-                          className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
-                        />
-                        <span className="text-sm flex-1">{ing.nombre}</span>
-                        {ing.es_alergeno && (
-                          <Badge variant="danger" size="sm">Alérgeno</Badge>
-                        )}
-                      </label>
-                    ))
+                    .map((ing) => {
+                      const cantidad = ingCantidades.get(ing.id) ?? 0;
+                      const seleccionado = ingCantidades.has(ing.id);
+                      return (
+                        <div
+                          key={ing.id}
+                          className={`flex items-center gap-2 rounded p-1 ${seleccionado ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={seleccionado}
+                            onChange={(e) => {
+                              setIngCantidades((prev) => {
+                                const next = new Map(prev);
+                                if (e.target.checked) next.set(ing.id, 1);
+                                else next.delete(ing.id);
+                                return next;
+                              });
+                            }}
+                            className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 flex-shrink-0"
+                          />
+                          <span className="text-sm flex-1">{ing.nombre}</span>
+                          {ing.es_alergeno && (
+                            <Badge variant="danger" size="sm">Alérgeno</Badge>
+                          )}
+                          {seleccionado && (
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setIngCantidades((prev) => {
+                                    const next = new Map(prev);
+                                    const v = (prev.get(ing.id) ?? 1) - 1;
+                                    if (v <= 0) next.delete(ing.id);
+                                    else next.set(ing.id, v);
+                                    return next;
+                                  })
+                                }
+                                className="w-6 h-6 rounded border text-xs flex items-center justify-center hover:bg-gray-100"
+                              >
+                                −
+                              </button>
+                              <span className="w-6 text-center text-sm font-semibold">{cantidad}</span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setIngCantidades((prev) => {
+                                    const next = new Map(prev);
+                                    next.set(ing.id, (prev.get(ing.id) ?? 1) + 1);
+                                    return next;
+                                  })
+                                }
+                                className="w-6 h-6 rounded border text-xs flex items-center justify-center hover:bg-gray-100"
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
                 )}
               </div>
             </div>

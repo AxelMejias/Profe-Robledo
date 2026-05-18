@@ -143,3 +143,30 @@ refactor(modulo): descripción del refactor
 test(modulo): descripción de los tests
 docs(modulo): descripción del cambio en docs
 ```
+
+---
+
+## Changelog
+
+### 2026-05-18 — Integración MercadoPago Checkout Pro + personalización de productos
+
+**MercadoPago Checkout Pro (sandbox)**
+- Integración completa del flujo de pago: creación de preferencia → checkout MP → webhook IPN → transición automática PENDIENTE → CONFIRMADO
+- Webhook: verificación de firma HMAC-SHA256; en modo sandbox (`MP_SANDBOX=true`) la firma se omite para compatibilidad con el entorno de pruebas de MP
+- Columna `mp_payment_id` migrada de `INTEGER` a `BIGINT` (migración `0008`) — los IDs de pago de MP superan el máximo de 32 bits
+- Nuevo archivo `backend/.env.example` con todas las variables necesarias incluyendo `MP_NOTIFICATION_URL` y `MP_WEBHOOK_SECRET`
+- Para pruebas locales se requiere ngrok (u otro túnel HTTP) con la URL configurada en `MP_NOTIFICATION_URL` y en el panel de webhooks de MP
+
+**Personalización de productos (ingredientes como extras)**
+- Los productos ahora soportan ingredientes configurables con `tipo_extra`, `precio_extra` y `disponible_como_extra`
+- El carrito y el modal de personalización permiten seleccionar extras al agregar un producto
+- Nuevo campo `cantidad` en la tabla intermedia `producto_ingredientes`
+- Migraciones `0003` a `0007` para los nuevos campos en ingredientes y producto_ingredientes
+- Seed actualizado con datos de ejemplo para ingredientes y extras
+
+**Frontend**
+- `PersonalizacionModal`: selección de extras con validación de límites y cálculo de precio en tiempo real
+- `CartDrawer`: muestra los extras seleccionados por ítem
+- `ProductoCard` / `ProductoDetalle`: integrados con el modal de personalización
+- `GestionIngredientes` (admin): CRUD completo de ingredientes con soporte para tipo extra y precio
+- `FormProducto` (admin): gestión de ingredientes asociados al producto con cantidad y precio extra

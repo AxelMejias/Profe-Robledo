@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+﻿import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useIngresos7Dias } from '@/entities/admin/hooks';
 import { Skeleton } from '@/shared/ui';
 
@@ -10,9 +10,9 @@ export function GraficoIngresos7Dias() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-lg font-semibold mb-4">Ingresos últimos 7 días</h2>
-      <ResponsiveContainer width="100%" height={300}>
+    <div className="bg-white rounded-lg shadow-md p-4">
+      <h2 className="text-lg font-semibold mb-2">Ingresos últimos 7 días</h2>
+      <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data || []}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis

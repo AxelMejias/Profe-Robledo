@@ -113,11 +113,33 @@ export function useAddIngrediente() {
       producto_id,
       ingrediente_id,
       es_removible,
+      cantidad,
     }: {
       producto_id: number;
       ingrediente_id: number;
       es_removible?: boolean;
-    }) => productosApi.addIngrediente(producto_id, ingrediente_id, es_removible),
+      cantidad?: number;
+    }) => productosApi.addIngrediente(producto_id, ingrediente_id, es_removible, cantidad),
+    onSuccess: (_, { producto_id }) => {
+      queryClient.invalidateQueries({ queryKey: ['productos', producto_id] });
+      queryClient.invalidateQueries({ queryKey: ['productos'] });
+    },
+  });
+}
+
+export function useUpdateIngredienteCantidad() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      producto_id,
+      ingrediente_id,
+      cantidad,
+    }: {
+      producto_id: number;
+      ingrediente_id: number;
+      cantidad: number;
+    }) => productosApi.updateIngredienteCantidad(producto_id, ingrediente_id, cantidad),
     onSuccess: (_, { producto_id }) => {
       queryClient.invalidateQueries({ queryKey: ['productos', producto_id] });
       queryClient.invalidateQueries({ queryKey: ['productos'] });

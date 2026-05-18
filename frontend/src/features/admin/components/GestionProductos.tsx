@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useProductos, useDeleteProducto, useToggleDisponibilidad } from '@/entities/producto/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Skeleton, EmptyState, Badge, Modal } from '@/shared/ui';
@@ -60,7 +60,7 @@ export function GestionProductos() {
           action={{ label: 'Agregar producto', onClick: () => setShowFormModal(true) }}
         />
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

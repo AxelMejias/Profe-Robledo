@@ -1,14 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export interface CartItemExtra {
+  ingrediente_id: number;
+  nombre: string;
+  precio: number; // precio por unidad
+  cantidad: number;
+}
+
 export interface CartItem {
+  cartKey: string; // producto_id + personalizacion + extras — identifica una configuración única
   producto_id: number;
   nombre: string;
-  precio: number;
+  precio: number; // precio total incluyendo extras
   imagen_url: string | null;
   cantidad: number;
-  // IDs de ingredientes que el cliente quiere excluir (RN-CR04, RN-CR05)
-  personalizacion: number[];
+  personalizacion: number[]; // IDs de ingredientes excluidos (RN-CR04, RN-CR05)
+  extras: CartItemExtra[];   // ingredientes agregados extra
 }
 
 interface CartState {
@@ -16,8 +24,8 @@ interface CartState {
 
   // Acciones
   addItem: (item: Omit<CartItem, "cantidad">, cantidad?: number) => void;
-  removeItem: (producto_id: number) => void;
-  updateCantidad: (producto_id: number, cantidad: number) => void;
+  removeItem: (cartKey: string) => void;
+  updateCantidad: (cartKey: string, cantidad: number) => void;
   clearCart: () => void;
 
   // Selectores — suscribirse por slice para evitar re-renders innecesarios
@@ -35,14 +43,12 @@ export const useCartStore = create<CartState>()(
       items: [],
 
       addItem: (item, cantidad = 1) => {
-        const existing = get().items.find(
-          (i) => i.producto_id === item.producto_id
-        );
+        const existing = get().items.find((i) => i.cartKey === item.cartKey);
         if (existing) {
-          // Si ya existe, incrementa la cantidad (RN-CR03)
+          // Si ya existe la misma configuración, incrementa la cantidad (RN-CR03)
           set({
             items: get().items.map((i) =>
-              i.producto_id === item.producto_id
+              i.cartKey === item.cartKey
                 ? { ...i, cantidad: i.cantidad + cantidad }
                 : i
             ),
@@ -52,17 +58,17 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      removeItem: (producto_id) =>
-        set({ items: get().items.filter((i) => i.producto_id !== producto_id) }),
+      removeItem: (cartKey) =>
+        set({ items: get().items.filter((i) => i.cartKey !== cartKey) }),
 
-      updateCantidad: (producto_id, cantidad) => {
+      updateCantidad: (cartKey, cantidad) => {
         if (cantidad <= 0) {
-          get().removeItem(producto_id);
+          get().removeItem(cartKey);
           return;
         }
         set({
           items: get().items.map((i) =>
-            i.producto_id === producto_id ? { ...i, cantidad } : i
+            i.cartKey === cartKey ? { ...i, cantidad } : i
           ),
         });
       },
@@ -79,7 +85,7 @@ export const useCartStore = create<CartState>()(
       total: () => get().subtotal() + get().costoEnvio(),
     }),
     {
-      name: "food-store-cart",
+      name: "food-store-cart-v3",
       // Persistimos los items completos — el carrito sobrevive al cierre del navegador (RN-CR02)
       partialize: (state) => ({ items: state.items }),
     }

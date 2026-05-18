@@ -23,11 +23,11 @@ export function VentasPage() {
           ))}
         </div>
       ) : !data?.items.length ? (
-        <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500">
+        <div className="bg-white rounded-lg shadow-md p-10 text-center text-gray-500">
           No hay ventas registradas todavía.
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -82,7 +82,7 @@ export function VentasPage() {
       <div className="flex justify-center pt-4">
         <Link
           to="/admin/pedidos"
-          className="flex flex-col items-center gap-2 px-8 py-5 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-300 transition-all group"
+          className="flex flex-col items-center gap-2 px-8 py-5 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-md hover:border-primary-300 transition-all group"
         >
           <span className="text-4xl group-hover:scale-110 transition-transform">🛒</span>
           <span className="text-sm font-medium text-gray-700 group-hover:text-primary-500 transition-colors">

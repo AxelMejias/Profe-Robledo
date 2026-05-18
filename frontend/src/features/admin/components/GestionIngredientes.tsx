@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useForm } from '@tanstack/react-form';
 import * as XLSX from 'xlsx';
 import {
@@ -24,22 +24,62 @@ function FormIngrediente({
   const addToast = useUIStore((s) => s.addToast);
   const isEditing = !!ingrediente;
 
+  const UNIDADES = [
+    { value: 'UNIDAD', label: 'Unidad' },
+    { value: 'G',      label: 'Gramos (g)' },
+    { value: 'KG',     label: 'Kilogramos (kg)' },
+    { value: 'ML',     label: 'Mililitros (ml)' },
+    { value: 'L',      label: 'Litros (l)' },
+  ];
+
+  const TIPOS_EXTRA = [
+    { value: '',            label: 'General (todos los productos)' },
+    { value: 'hamburguesa', label: 'Hamburguesas' },
+    { value: 'postre',      label: 'Postres' },
+    { value: 'bebida',      label: 'Bebidas' },
+    { value: 'jugo',        label: 'Jugos' },
+  ];
+
+  const formatARS = (n: number) =>
+    n > 0 ? new Intl.NumberFormat('es-AR').format(n) : '';
+  const parsePrecio = (raw: string) => {
+    const normalized = raw.replace(/\./g, '').replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const [rawPrecio, setRawPrecio] = useState(
+    formatARS(Number(ingrediente?.precio ?? 0))
+  );
+
   const form = useForm({
     defaultValues: {
       nombre: ingrediente?.nombre ?? '',
       descripcion: ingrediente?.descripcion ?? '',
       es_alergeno: ingrediente?.es_alergeno ?? false,
+      unidad_medida: ingrediente?.unidad_medida ?? 'UNIDAD',
+      precio: Number(ingrediente?.precio ?? 0),
+      tipo_extra: ingrediente?.tipo_extra ?? '',
+      disponible_como_extra: ingrediente?.disponible_como_extra ?? false,
     },
     onSubmit: async ({ value }) => {
       try {
         if (isEditing) {
-          await updateMutation.mutateAsync({ id: ingrediente.id, body: value });
+          await updateMutation.mutateAsync({ id: ingrediente.id, body: {
+            ...value,
+            tipo_extra: value.tipo_extra || undefined,
+            disponible_como_extra: value.disponible_como_extra,
+          }});
           addToast('success', 'Ingrediente actualizado');
         } else {
           await createMutation.mutateAsync({
             nombre: value.nombre,
             descripcion: value.descripcion || undefined,
             es_alergeno: value.es_alergeno,
+            unidad_medida: value.unidad_medida,
+            precio: value.precio,
+            tipo_extra: value.tipo_extra || undefined,
+            disponible_como_extra: value.disponible_como_extra,
           });
           addToast('success', 'Ingrediente creado');
         }
@@ -121,6 +161,104 @@ function FormIngrediente({
           )}
         />
 
+        <form.Field
+          name="unidad_medida"
+          children={(field) => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Unidad de medida <span className="text-danger">*</span>
+              </label>
+              <select
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+              >
+                {UNIDADES.map((u) => (
+                  <option key={u.value} value={u.value}>{u.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="precio"
+          validators={{
+            onChange: ({ value }) =>
+              value < 0 ? 'El precio no puede ser negativo' : undefined,
+          }}
+          children={(field) => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Precio extra (por unidad)
+              </label>
+              <Input
+                type="text"
+                inputMode="numeric"
+                placeholder="Ej: 500"
+                value={rawPrecio}
+                onChange={(e) => {
+                  setRawPrecio(e.target.value);
+                  field.handleChange(parsePrecio(e.target.value));
+                }}
+                onBlur={field.handleBlur}
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Costo que se agrega al producto cuando el cliente lo elige como extra.
+              </p>
+              {field.state.meta.errors.length > 0 && (
+                <p className="text-sm text-danger mt-1">{field.state.meta.errors[0]}</p>
+              )}
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="tipo_extra"
+          children={(field) => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aplica como extra en
+              </label>
+              <select
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+              >
+                {TIPOS_EXTRA.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Controla en qué categoría de productos aparece como ingrediente extra disponible.
+              </p>
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="disponible_como_extra"
+          children={(field) => (
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={field.state.value}
+                onChange={(e) => field.handleChange(e.target.checked)}
+                className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Disponible como extra para el cliente
+                </label>
+                <p className="text-xs text-gray-400">
+                  Si está desactivado, no aparece en el modal de personalización aunque sea de la categoría correcta.
+                </p>
+              </div>
+            </div>
+          )}
+        />
+
         <div className="flex gap-3 justify-end pt-4 border-t">
           <Button onClick={onClose} variant="ghost" disabled={isPending}>
             Cancelar
@@ -171,9 +309,17 @@ export function GestionIngredientes() {
         const descripcion = String(row['descripcion'] || row['Descripción'] || row['Descripcion'] || '').trim() || undefined;
         const raw = String(row['es_alergeno'] || row['Es alérgeno'] || row['alergeno'] || '').trim().toLowerCase();
         const es_alergeno = ['true', '1', 'si', 'sí', 'yes', 'verdadero'].includes(raw);
+        const rawUnidad = String(row['unidad_medida'] || row['Unidad'] || row['unidad'] || '').trim().toUpperCase();
+        const unidad_medida = ['UNIDAD', 'G', 'KG', 'ML', 'L'].includes(rawUnidad) ? rawUnidad : 'UNIDAD';
+        const rawPrecioXlsx = parseFloat(String(row['precio'] || row['Precio'] || '0').replace(/\./g, '').replace(',', '.'));
+        const precio = isNaN(rawPrecioXlsx) ? 0 : rawPrecioXlsx;
+        const rawTipo = String(row['tipo_extra'] || row['Tipo'] || row['tipo'] || '').trim().toLowerCase();
+        const tipo_extra = ['hamburguesa', 'postre', 'bebida', 'jugo'].includes(rawTipo) ? rawTipo : undefined;
+        const rawExtra = String(row['disponible_como_extra'] || row['Extra'] || row['extra'] || '').trim().toLowerCase();
+        const disponible_como_extra = ['true', '1', 'si', 'sí', 'yes', 'verdadero'].includes(rawExtra);
 
         try {
-          await ingredientesApi.createIngrediente({ nombre, descripcion, es_alergeno });
+          await ingredientesApi.createIngrediente({ nombre, descripcion, es_alergeno, unidad_medida, precio, tipo_extra, disponible_como_extra });
           creados++;
         } catch {
           errores++;
@@ -244,7 +390,7 @@ export function GestionIngredientes() {
           action={{ label: 'Agregar ingrediente', onClick: () => setShowForm(true) }}
         />
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -253,6 +399,18 @@ export function GestionIngredientes() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Descripción
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Unidad
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Precio extra
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Aplica en
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Extra
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Alérgeno
@@ -268,6 +426,22 @@ export function GestionIngredientes() {
                   <td className="px-6 py-4 font-medium">{ing.nombre}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {ing.descripcion || '—'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {ing.unidad_medida}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {Number(ing.precio) > 0
+                      ? `$${new Intl.NumberFormat('es-AR').format(Number(ing.precio))}`
+                      : '—'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                    {ing.tipo_extra || '—'}
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge variant={ing.disponible_como_extra ? 'primary' : 'gray'} size="sm">
+                      {ing.disponible_como_extra ? 'Sí' : 'No'}
+                    </Badge>
                   </td>
                   <td className="px-6 py-4">
                     <Badge variant={ing.es_alergeno ? 'danger' : 'gray'} size="sm">

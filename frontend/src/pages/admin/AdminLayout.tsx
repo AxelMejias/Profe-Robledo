@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/shared/store/authStore';
 import { Button } from '@/shared/ui';
 import { useEffect } from 'react';
@@ -34,9 +34,9 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md">
+      <aside className="w-64 bg-white shadow-md flex-shrink-0">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-primary-500">Admin Panel</h2>
@@ -46,21 +46,28 @@ export function AdminLayout() {
           </div>
           <nav className="space-y-2">
             {menuItems.map((item) => (
-              <Link
+              <NavLink
                 key={item.to}
                 to={item.to}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                end={item.to === '/admin'}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors border-2 ${
+                    isActive
+                      ? 'border-[#69A9FF] bg-transparent'
+                      : 'border-transparent hover:bg-[#F8F1EB]'
+                  }`
+                }
               >
                 <span className="text-2xl">{item.icon}</span>
                 <span className="font-medium">{item.label}</span>
-              </Link>
+              </NavLink>
             ))}
           </nav>
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 overflow-y-auto bg-[#F8F1EB]/70 p-6">
         <Outlet />
       </main>
     </div>

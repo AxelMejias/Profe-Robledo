@@ -6,6 +6,7 @@ from app.core.deps import require_role
 from app.core.uow import UnitOfWork
 from app.modules.productos import service as prod_service
 from app.modules.productos.schemas import (
+    ActualizarIngredientePivotRequest,
     AsociarIngredienteRequest,
     AssignCategoriasRequest,
     DisponibilidadUpdate,
@@ -148,6 +149,20 @@ async def add_ingrediente(
 ) -> ProductoIngredienteRead:
     async with UnitOfWork() as uow:
         return await prod_service.add_ingrediente(uow, producto_id, body)
+
+
+@router.patch(
+    "/{producto_id}/ingredientes/{ingrediente_id}",
+    response_model=ProductoIngredienteRead,
+)
+async def update_cantidad_ingrediente(
+    producto_id: int,
+    ingrediente_id: int,
+    body: ActualizarIngredientePivotRequest,
+    _: Usuario = Depends(require_role(["ADMIN"])),
+) -> ProductoIngredienteRead:
+    async with UnitOfWork() as uow:
+        return await prod_service.update_cantidad_ingrediente(uow, producto_id, ingrediente_id, body)
 
 
 @router.delete(

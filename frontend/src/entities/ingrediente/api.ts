@@ -5,12 +5,20 @@ export interface IngredienteCreate {
   nombre: string;
   descripcion?: string;
   es_alergeno: boolean;
+  unidad_medida?: string;
+  precio?: number;
+  tipo_extra?: string;
+  disponible_como_extra?: boolean;
 }
 
 export interface IngredienteUpdate {
   nombre?: string;
   descripcion?: string;
   es_alergeno?: boolean;
+  unidad_medida?: string;
+  precio?: number;
+  tipo_extra?: string;
+  disponible_como_extra?: boolean;
 }
 
 export const ingredientesApi = {

@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { useProducto } from '@/entities/producto/hooks';
+import { useIngredientes } from '@/entities/ingrediente/hooks';
 import { useCartStore } from '@/shared/store/cartStore';
 import { useUIStore } from '@/shared/store/uiStore';
-import { Button, Badge, Skeleton, EmptyState } from '@/shared/ui';
+import { Button, Skeleton, EmptyState } from '@/shared/ui';
 import { PersonalizacionModal } from './PersonalizacionModal';
+import type { CartItemExtra } from '@/shared/store/cartStore';
+
+const formatARS = (n: number) =>
+  new Intl.NumberFormat('es-AR', { maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
 
 interface ProductoDetalleProps {
   productoId: number;
@@ -11,6 +16,7 @@ interface ProductoDetalleProps {
 
 export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
   const { data: producto, isLoading, isError } = useProducto(productoId);
+  const { data: todosIngredientes } = useIngredientes();
   const addItem = useCartStore((s) => s.addItem);
   const addToast = useUIStore((s) => s.addToast);
 
@@ -37,49 +43,64 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
   }
 
   const isDisponible = producto.disponible && producto.stock_cantidad > 0;
-  const ingredientesRemovibles = producto.ingredientes?.filter(() => {
-    return true;
-  }) ?? [];
+  const ingredientesRemovibles = producto.ingredientes?.filter((i) => i.es_removible) ?? [];
+
+  // Todos los ingredientes de la misma categoría del producto, incluyendo los que ya tiene (para agregar extra)
+  const productCategoryNames = (producto.categorias ?? []).map((c) => c.nombre.toLowerCase());
+  const extrasDisponibles = (todosIngredientes ?? []).filter((i) => {
+    if (!i.disponible_como_extra) return false;
+    if (!i.tipo_extra) return true;
+    return productCategoryNames.some((cat) => cat.startsWith(i.tipo_extra!));
+  });
+
+  const puedePersonalizar = isDisponible && (ingredientesRemovibles.length > 0 || extrasDisponibles.length > 0);
+
+  const makeCartKey = (excluidos: number[], extras: CartItemExtra[]) =>
+    `${producto.id}-${[...excluidos].sort().join(',')}-${[...extras].sort((a, b) => a.ingrediente_id - b.ingrediente_id).map((e) => `${e.ingrediente_id}x${e.cantidad}`).join(',')}`;
 
   const handleAgregarSimple = () => {
     if (!isDisponible) return;
-
     addItem({
+      cartKey: makeCartKey([], []),
       producto_id: producto.id,
       nombre: producto.nombre,
-      precio: producto.precio_base,
+      precio: Number(producto.precio_base),
       imagen_url: producto.imagen_url ?? null,
       personalizacion: [],
+      extras: [],
     });
-
     addToast('success', `${producto.nombre} agregado al carrito`);
   };
 
-  const handleAgregarConPersonalizacion = (ingredientesExcluidos: number[]) => {
+  const handleAgregarConPersonalizacion = (excluidos: number[], extras: CartItemExtra[]) => {
+    const precioExtras = extras.reduce((sum, e) => sum + e.precio * e.cantidad, 0);
     addItem({
+      cartKey: makeCartKey(excluidos, extras),
       producto_id: producto.id,
       nombre: producto.nombre,
-      precio: producto.precio_base,
+      precio: Number(producto.precio_base) + precioExtras,
       imagen_url: producto.imagen_url ?? null,
-      personalizacion: ingredientesExcluidos,
+      personalizacion: excluidos,
+      extras,
     });
-
-    addToast('success', `${producto.nombre} agregado al carrito con personalización`);
-
+    const msg = precioExtras > 0
+      ? `${producto.nombre} agregado con extras (+$${formatARS(precioExtras)})`
+      : `${producto.nombre} agregado al carrito`;
+    addToast('success', msg);
     setShowPersonalizacion(false);
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="grid md:grid-cols-2 gap-8 p-6">
           {/* Imagen */}
-          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+          <div className="aspect-square bg-white rounded-lg overflow-hidden">
             {producto.imagen_url ? (
               <img
                 src={producto.imagen_url}
                 alt={producto.nombre}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -100,7 +121,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
             {/* Precio y stock */}
             <div className="space-y-2">
               <div className="text-4xl font-bold text-primary-500">
-                ${producto.precio_base}
+                ${formatARS(Number(producto.precio_base))}
               </div>
               <div className="text-sm text-gray-600">
                 {producto.stock_cantidad > 0 ? (
@@ -114,34 +135,36 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
             {/* Categorías */}
             {producto.categorias && producto.categorias.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">
-                  Categorías
-                </h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Categorías</h3>
                 <div className="flex flex-wrap gap-2">
                   {producto.categorias.map((cat) => (
-                    <Badge key={cat.id} variant="secondary">
+                    <span
+                      key={cat.id}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium border border-gray-200 text-gray-700 bg-gray-100"
+                    >
                       {cat.nombre}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Ingredientes */}
+            {/* Ingredientes — alérgenos con borde rojo */}
             {producto.ingredientes && producto.ingredientes.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">
-                  Ingredientes
-                </h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Ingredientes</h3>
                 <div className="flex flex-wrap gap-2">
                   {producto.ingredientes.map((ing) => (
-                    <Badge
-                      key={ing.id}
-                      variant={ing.es_alergeno ? 'danger' : 'gray'}
+                    <span
+                      key={ing.ingrediente_id}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium border ${
+                        ing.es_alergeno
+                          ? 'border-red-400 text-red-600 bg-white'
+                          : 'border-gray-200 text-gray-700 bg-gray-100'
+                      }`}
                     >
-                      {ing.nombre}
-                      {ing.es_alergeno && ' ⚠ Alérgeno'}
-                    </Badge>
+                      {ing.nombre}{ing.cantidad > 1 ? ` ×${ing.cantidad}` : ''}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -158,14 +181,14 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
                 {isDisponible ? 'Agregar al carrito' : 'No disponible'}
               </Button>
 
-              {isDisponible && ingredientesRemovibles.length > 0 && (
+              {puedePersonalizar && (
                 <Button
                   onClick={() => setShowPersonalizacion(true)}
                   variant="ghost"
                   size="lg"
                   className="w-full"
                 >
-                  Personalizar (sin ingredientes)
+                  Personalizar pedido
                 </Button>
               )}
             </div>
@@ -178,6 +201,7 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
         <PersonalizacionModal
           producto={producto}
           ingredientes={ingredientesRemovibles}
+          extrasDisponibles={extrasDisponibles}
           onConfirm={handleAgregarConPersonalizacion}
           onCancel={() => setShowPersonalizacion(false)}
         />
@@ -185,4 +209,3 @@ export function ProductoDetalle({ productoId }: ProductoDetalleProps) {
     </div>
   );
 }
-

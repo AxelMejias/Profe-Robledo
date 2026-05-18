@@ -48,6 +48,10 @@ export interface Ingrediente {
   nombre: string;
   descripcion?: string;
   es_alergeno: boolean;
+  unidad_medida: string;
+  precio: number;
+  tipo_extra?: string | null;
+  disponible_como_extra: boolean;
   creado_en: string;
   actualizado_en: string;
 }
@@ -64,13 +68,21 @@ export interface Producto {
   actualizado_en: string;
   eliminado_en?: string;
   categorias?: Categoria[];
-  ingredientes?: Ingrediente[];
+  ingredientes?: ProductoIngredienteInfo[];
 }
 
 export interface ProductoIngrediente {
   producto_id: number;
   ingrediente_id: number;
   es_removible: boolean;
+}
+
+export interface ProductoIngredienteInfo {
+  ingrediente_id: number;
+  nombre: string;
+  es_alergeno: boolean;
+  es_removible: boolean;
+  cantidad: number;
 }
 
 export interface FormaPago {
@@ -178,6 +190,7 @@ export interface ItemCarritoLocal {
   imagen_url?: string;
   cantidad: number;
   personalizacion: number[];
+  extras?: { ingrediente_id: number; nombre: string; precio: number }[];
 }
 
 export interface ItemPedidoRequest {

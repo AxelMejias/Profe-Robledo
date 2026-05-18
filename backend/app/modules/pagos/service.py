@@ -185,11 +185,17 @@ async def procesar_webhook(
     request: Request,
     body: WebhookMP,
 ) -> None:
+    logger.warning("WEBHOOK recibido: type=%s data=%s headers=%s", body.type, body.data, dict(request.headers))
+
     # Verificar firma si hay secret configurado
     if settings.MP_WEBHOOK_SECRET and not _verificar_firma(request, body, settings.MP_WEBHOOK_SECRET):
-        return  # Ignorar silenciosamente — siempre devolver 200
+        if not settings.MP_SANDBOX:
+            logger.warning("WEBHOOK firma inválida — descartando")
+            return
+        logger.warning("WEBHOOK firma inválida en sandbox — procesando igualmente")
 
     if body.type != "payment" or not body.data:
+        logger.warning("WEBHOOK ignorado: type=%s data=%s", body.type, body.data)
         return
 
     payment_id = str(body.data.get("id", ""))

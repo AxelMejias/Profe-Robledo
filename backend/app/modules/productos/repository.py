@@ -93,6 +93,7 @@ class ProductoRepository(BaseRepository[Producto]):
                 Ingrediente.nombre,
                 Ingrediente.es_alergeno,
                 ProductoIngrediente.es_removible,
+                ProductoIngrediente.cantidad,
             )
             .join(ProductoIngrediente, ProductoIngrediente.ingrediente_id == Ingrediente.id)
             .where(ProductoIngrediente.producto_id == producto_id)
@@ -105,6 +106,7 @@ class ProductoRepository(BaseRepository[Producto]):
                 "nombre": row[1],
                 "es_alergeno": row[2],
                 "es_removible": row[3],
+                "cantidad": row[4],
             }
             for row in result.all()
         ]
@@ -124,14 +126,27 @@ class ProductoRepository(BaseRepository[Producto]):
         await self.session.flush()
 
     async def add_ingrediente(
-        self, producto_id: int, ingrediente_id: int, es_removible: bool
+        self, producto_id: int, ingrediente_id: int, es_removible: bool, cantidad: int = 1
     ) -> None:
         self.session.add(
             ProductoIngrediente(
                 producto_id=producto_id,
                 ingrediente_id=ingrediente_id,
                 es_removible=es_removible,
+                cantidad=cantidad,
             )
+        )
+        await self.session.flush()
+
+    async def update_cantidad_ingrediente(
+        self, producto_id: int, ingrediente_id: int, cantidad: int
+    ) -> None:
+        from sqlalchemy import update as sa_update
+        await self.session.execute(
+            sa_update(ProductoIngrediente)
+            .where(ProductoIngrediente.producto_id == producto_id)
+            .where(ProductoIngrediente.ingrediente_id == ingrediente_id)
+            .values(cantidad=cantidad)
         )
         await self.session.flush()
 

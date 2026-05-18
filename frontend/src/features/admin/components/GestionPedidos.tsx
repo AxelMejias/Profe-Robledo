@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePedidos } from '@/entities/pedido/hooks';
 import { Skeleton, Badge, Button } from '@/shared/ui';
@@ -24,7 +24,7 @@ export function GestionPedidos() {
       <h1 className="text-3xl font-bold">Gestión de Pedidos</h1>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="bg-white rounded-lg shadow-md p-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Filtrar por estado
         </label>
@@ -49,7 +49,7 @@ export function GestionPedidos() {
       </div>
 
       {/* Tabla de pedidos */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

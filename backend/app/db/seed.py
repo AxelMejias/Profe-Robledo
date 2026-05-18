@@ -67,16 +67,86 @@ CATEGORIAS = [
     ("Combos",       "Armá tu combo completo"),
 ]
 
+# (nombre, descripcion, es_alergeno, unidad_medida, precio, tipo_extra, disponible_como_extra)
+INGREDIENTES = [
+    ("Medallón de carne",   "Medallón de carne vacuna, 150g",              False,  "UNIDAD",   1400, "hamburguesa", True),
+    ("Pan brioche",         "Pan artesanal con semillas de sésamo",        True,   "UNIDAD",    400, "hamburguesa", False),
+    ("Lechuga",             "Lechuga fresca",                              False,  "G",         150, "hamburguesa", True),
+    ("Tomate",              "Tomate fresco en rodajas",                    False,  "G",         180, "hamburguesa", True),
+    ("Queso cheddar",       "Feta de queso cheddar madurado, 25g",         True,   "G",         500, "hamburguesa", True),
+    ("Cebolla",             "Cebolla en aros o caramelizada",              False,  "G",         100, "hamburguesa", True),
+    ("Panceta",             "Panceta ahumada crocante",                    False,  "G",         600, "hamburguesa", True),
+    ("Salsa BBQ",           "Salsa barbecue ahumada",                      False,  "ML",        180, "hamburguesa", True),
+    ("Ketchup",             "Salsa de tomate",                             False,  "ML",        120, "hamburguesa", True),
+    ("Mayonesa",            "Mayonesa casera",                             True,   "ML",        120, "hamburguesa", True),
+    ("Chocolate",           "Cobertura de chocolate negro",                True,   "G",         800, "postre",      False),
+    ("Harina de trigo",     "Harina 0000",                                 True,   "G",         150, "postre",      False),
+    ("Huevo",               "Huevo de gallina",                            True,   "UNIDAD",    200, "postre",      False),
+    ("Azúcar",              "Azúcar refinada",                             False,  "G",         100, "postre",      False),
+    ("Helado de vainilla",  "Crema de vainilla artesanal",                 True,   "ML",        600, "postre",      True),
+    ("Crema de leche",      "Crema para repostería",                       True,   "ML",        350, "postre",      True),
+    ("Naranja",             "Naranja fresca exprimida",                    False,  "UNIDAD",    300, "jugo",        True),
+]
+
+# producto → [(ingrediente, es_removible, cantidad)]
+PRODUCTO_INGREDIENTES = {
+    "Hamburguesa Clásica": [
+        ("Medallón de carne", False, 1),
+        ("Pan brioche",       False, 1),
+        ("Lechuga",           True,  1),
+        ("Tomate",            True,  1),
+        ("Queso cheddar",     True,  1),
+        ("Ketchup",           True,  1),
+        ("Mayonesa",          True,  1),
+    ],
+    "Hamburguesa Doble": [
+        ("Medallón de carne", False, 2),
+        ("Pan brioche",       False, 1),
+        ("Queso cheddar",     True,  1),
+        ("Cebolla",           True,  1),
+        ("Ketchup",           True,  1),
+        ("Mayonesa",          True,  1),
+    ],
+    "Hamburguesa BBQ": [
+        ("Medallón de carne", False, 1),
+        ("Pan brioche",       False, 1),
+        ("Queso cheddar",     True,  1),
+        ("Panceta",           True,  1),
+        ("Cebolla",           True,  1),
+        ("Salsa BBQ",         True,  1),
+    ],
+    "Jugo de Naranja": [
+        ("Naranja",           False, 1),
+    ],
+    "Brownie con helado": [
+        ("Chocolate",         False, 1),
+        ("Harina de trigo",   False, 1),
+        ("Huevo",             False, 1),
+        ("Azúcar",            False, 1),
+        ("Helado de vainilla", True, 1),
+        ("Crema de leche",    True,  1),
+    ],
+    "Combo Clásico": [
+        ("Medallón de carne", False, 1),
+        ("Pan brioche",       False, 1),
+        ("Lechuga",           True,  1),
+        ("Tomate",            True,  1),
+        ("Queso cheddar",     True,  1),
+        ("Ketchup",           True,  1),
+        ("Mayonesa",          True,  1),
+    ],
+}
+
 # (nombre, descripcion, precio, stock, categoria)
 PRODUCTOS = [
-    ("Hamburguesa Clásica",   "Carne, lechuga, tomate y queso",        1200.00, 50, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+Clasica"),
-    ("Hamburguesa Doble",     "Doble medallón con cheddar y cebolla",  1750.00, 30, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+Doble"),
-    ("Hamburguesa BBQ",       "Medallón, panceta y salsa BBQ",         1900.00, 25, "Hamburguesas", "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Hamburguesa+BBQ"),
-    ("Coca-Cola 500ml",       "Lata fría",                              350.00, 100, "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Coca+Cola"),
-    ("Agua Mineral",          "Sin gas, 500ml",                         200.00, 80,  "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Agua+Mineral"),
-    ("Jugo de Naranja",       "Natural exprimido",                      450.00, 40,  "Bebidas",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Jugo+Naranja"),
-    ("Brownie con helado",    "Brownie tibio + bocha de vainilla",      800.00, 20,  "Postres",     "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Brownie+Helado"),
-    ("Combo Clásico",         "Hamburguesa Clásica + bebida a elección", 1500.00, 40, "Combos",      "https://placehold.co/400x300/EFF6FF/1D4ED8?text=Combo+Clasico"),
+    ("Hamburguesa Clásica",   "Carne, lechuga, tomate y queso",        1200.00, 50, "Hamburguesas", "https://i.imgur.com/55LETSM.png"),
+    ("Hamburguesa Doble",     "Doble medallón con cheddar y cebolla",  1750.00, 30, "Hamburguesas", "https://i.imgur.com/MmEOXVA.png"),
+    ("Hamburguesa BBQ",       "Medallón, panceta y salsa BBQ",         1900.00, 25, "Hamburguesas", "https://i.imgur.com/NNMZqQS.png"),
+    ("Coca-Cola 500ml",       "Lata fría",                              350.00, 100, "Bebidas",     "https://i.imgur.com/Z3fd94q.jpeg"),
+    ("Agua Mineral",          "Sin gas, 500ml",                         200.00, 80,  "Bebidas",     "https://i.imgur.com/0dnhFWX.jpeg"),
+    ("Jugo de Naranja",       "Natural exprimido",                      450.00, 40,  "Bebidas",     "https://i.imgur.com/4AtOmta.png"),
+    ("Brownie con helado",    "Brownie tibio + bocha de vainilla",      800.00, 20,  "Postres",     "https://i.imgur.com/I9P7XOS.jpeg"),
+    ("Combo Clásico",         "Hamburguesa Clásica + bebida a elección", 1500.00, 40, "Combos",      "https://i.imgur.com/HLEDpQz.jpeg"),
 ]
 
 
@@ -170,7 +240,9 @@ def _seed_categorias(conn) -> dict[str, int]:
     return nombre_a_id
 
 
-def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
+def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> dict[str, int]:
+    """Inserta productos y devuelve un dict nombre→id."""
+    nombre_a_id: dict[str, int] = {}
     inserted = 0
     for nombre, descripcion, precio, stock, categoria, imagen_url in PRODUCTOS:
         row = conn.execute(
@@ -190,6 +262,8 @@ def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
             producto_id = result.fetchone()[0]
             inserted += 1
 
+        nombre_a_id[nombre] = producto_id
+
         cat_id = nombre_a_cat_id.get(categoria)
         if cat_id:
             conn.execute(
@@ -201,6 +275,58 @@ def _seed_productos(conn, nombre_a_cat_id: dict[str, int]) -> None:
             )
     skipped = len(PRODUCTOS) - inserted
     print(f"  productos      → {inserted} insertados, {skipped} ya existían")
+    return nombre_a_id
+
+
+def _seed_ingredientes(conn) -> dict[str, int]:
+    """Inserta ingredientes y devuelve un dict nombre→id."""
+    nombre_a_id: dict[str, int] = {}
+    inserted = 0
+    for nombre, descripcion, es_alergeno, unidad_medida, precio, tipo_extra, disponible_como_extra in INGREDIENTES:
+        row = conn.execute(
+            text("SELECT id FROM ingredientes WHERE nombre = :nombre AND eliminado_en IS NULL"),
+            {"nombre": nombre},
+        ).fetchone()
+        if row:
+            nombre_a_id[nombre] = row[0]
+        else:
+            result = conn.execute(
+                text(
+                    "INSERT INTO ingredientes (nombre, descripcion, es_alergeno, unidad_medida, precio, tipo_extra, disponible_como_extra) "
+                    "VALUES (:nombre, :descripcion, :es_alergeno, :unidad_medida, :precio, :tipo_extra, :disponible_como_extra) RETURNING id"
+                ),
+                {"nombre": nombre, "descripcion": descripcion, "es_alergeno": es_alergeno, "unidad_medida": unidad_medida, "precio": precio, "tipo_extra": tipo_extra, "disponible_como_extra": disponible_como_extra},
+            )
+            nombre_a_id[nombre] = result.fetchone()[0]
+            inserted += 1
+    skipped = len(INGREDIENTES) - inserted
+    print(f"  ingredientes   → {inserted} insertados, {skipped} ya existían")
+    return nombre_a_id
+
+
+def _seed_producto_ingredientes(
+    conn,
+    nombre_a_prod_id: dict[str, int],
+    nombre_a_ing_id: dict[str, int],
+) -> None:
+    inserted = 0
+    for prod_nombre, ings in PRODUCTO_INGREDIENTES.items():
+        prod_id = nombre_a_prod_id.get(prod_nombre)
+        if not prod_id:
+            continue
+        for ing_nombre, es_removible, cantidad in ings:
+            ing_id = nombre_a_ing_id.get(ing_nombre)
+            if not ing_id:
+                continue
+            result = conn.execute(
+                text(
+                    "INSERT INTO producto_ingredientes (producto_id, ingrediente_id, es_removible, cantidad) "
+                    "VALUES (:pid, :iid, :removible, :cantidad) ON CONFLICT DO NOTHING"
+                ),
+                {"pid": prod_id, "iid": ing_id, "removible": es_removible, "cantidad": cantidad},
+            )
+            inserted += result.rowcount
+    print(f"  prod↔ing       → {inserted} asociaciones nuevas")
 
 
 def _seed_admin_user(conn) -> None:
@@ -255,7 +381,9 @@ def run() -> None:
         _seed_formas_pago(conn)
         _seed_admin_user(conn)
         cat_ids = _seed_categorias(conn)
-        _seed_productos(conn, cat_ids)
+        prod_ids = _seed_productos(conn, cat_ids)
+        ing_ids = _seed_ingredientes(conn)
+        _seed_producto_ingredientes(conn, prod_ids, ing_ids)
 
     print()
     print("Seed completado.")

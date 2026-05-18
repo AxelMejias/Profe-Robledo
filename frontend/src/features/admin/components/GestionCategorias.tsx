@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCategorias, useDeleteCategoria } from '@/entities/categoria/hooks';
 import { useUIStore } from '@/shared/store/uiStore';
 import { Button, Skeleton, EmptyState, Modal } from '@/shared/ui';
@@ -49,7 +49,7 @@ export function GestionCategorias() {
           action={{ label: 'Agregar categoría', onClick: () => setShowFormModal(true) }}
         />
       ) : (
-        <div className="bg-white rounded-lg shadow-sm divide-y">
+        <div className="bg-white rounded-lg shadow-md divide-y">
           {categorias.map((cat) => (
             <div key={cat.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
               <div>
